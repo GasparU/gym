@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { FoodItem } from '../types/nutrition';
+import { EstadoAlimento } from './EstadoAlimento';
 
 interface AutocompleteProps {
   foods: FoodItem[];
@@ -24,6 +25,7 @@ export const AutocompleteFood: React.FC<AutocompleteProps> = ({
   const [results, setResults] = useState<FoodItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [ayuda, setAyuda] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -90,7 +92,45 @@ export const AutocompleteFood: React.FC<AutocompleteProps> = ({
         className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-500 transition-colors"
       />
 
-      {isOpen && (
+                    <div className="mt-1 flex items-center justify-between gap-2 text-[10px] text-slate-500">
+            <span>
+              Pesá crudo lo que sale de la bolsa · si el nombre dice COCIDO, pesá el plato
+            </span>
+            <button
+              type="button"
+              onClick={() => setAyuda((v) => !v)}
+              aria-expanded={ayuda}
+              className="shrink-0 underline hover:text-slate-300"
+            >
+              {ayuda ? "Ocultar guía" : "¿Cómo elijo?"}
+            </button>
+          </div>
+          {ayuda && (
+            <div className="mt-2 rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-[11px] leading-relaxed text-slate-300 space-y-1.5">
+              <p className="font-semibold text-slate-200">Guía rápida</p>
+              <p>
+                <b>1.</b> ¿Pesás lo que sale de la bolsa? Elegí{" "}
+                <span className="text-blue-300 font-semibold">CRUDO</span>.
+              </p>
+              <p>
+                <b>2.</b> ¿Pesás el plato servido? Elegí{" "}
+                <span className="text-amber-300 font-semibold">COCIDO</span>.
+              </p>
+              <p>
+                <b>3.</b> Las kcal son por 100 g: 300 o más = crudo; 100-160 = cocido (tiene agua).
+              </p>
+              <p>
+                <b>4.</b> La app tiene <b>ingredientes</b>, no platos. Un guiso = trigo + aceite +
+                carne, cada uno por separado.
+              </p>
+              <p className="border-t border-slate-700 pt-1.5">
+                <b>Ejemplo — "segundo de trigo":</b> elegí{" "}
+                <i>Trigo, mote de (sancochado)</i> (COCIDO, 154 kcal) y cargá el aceite y la carne
+                aparte.
+              </p>
+            </div>
+          )}
+          {isOpen && (
         <ul className="absolute z-50 left-0 right-0 mt-1.5 max-h-64 overflow-y-auto bg-slate-800 border border-slate-700 rounded-lg shadow-2xl py-1 text-sm divide-y divide-slate-700/50">
           {results.map((item, idx) => {
             const isSelected = idx === highlightedIndex;
@@ -110,17 +150,12 @@ export const AutocompleteFood: React.FC<AutocompleteProps> = ({
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {item.esCocido ? (
-                    <span className="text-[10px] bg-amber-900/60 text-amber-300 border border-amber-700/50 px-1.5 py-0.5 rounded uppercase font-semibold">
-                      Cocido
-                    </span>
-                  ) : (
-                    <span className="text-[10px] bg-blue-900/60 text-blue-300 border border-blue-700/50 px-1.5 py-0.5 rounded uppercase font-semibold">
-                      Crudo
-                    </span>
-                  )}
-                  <span className="text-xs font-semibold text-slate-300">{item.energiaKcal} kcal</span>
-                </div>
+
+                      <EstadoAlimento esCocido={item.esCocido} />
+
+                      <span className="text-xs font-semibold text-slate-300">{item.energiaKcal} kcal</span>
+
+                    </div>
               </li>
             );
           })}

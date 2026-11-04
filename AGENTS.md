@@ -155,3 +155,31 @@ fuente de verdad.
 - **Factor de actividad (decisión)**: 3 sesiones de 45-75 min + bici/caminata + trabajo sentado = **1,375
   (Ligero)**, que es lo que dice `DESCRIPCION_ACTIVIDAD.LIGERO`. 1,55 (Moderado) pide 4-5 sesiones.
   **No se cambió ningún default.** La calibración real es el promedio de peso semanal, no la tabla.
+
+### Ayuda para elegir el alimento correcto — TDAH (04/11/2026)
+
+- El badge **CRUDO / COCIDO** ya existía en el buscador; se extrajo a `src/components/EstadoAlimento.tsx`
+  y ahora también aparece en la **tabla de comidas** (antes no se veía el estado de lo cargado).
+- `AutocompleteFood` gana una **micro-línea fija** ("Pesá crudo lo que sale de la bolsa · si el nombre dice
+  COCIDO, pesá el plato") y el botón **"¿Cómo elijo?"** con una guía de 4 pasos + el ejemplo del
+  "segundo de trigo": **la app tiene INGREDIENTES, no platos**.
+- Regla de oro: **el peso y la entrada tienen que hablar el mismo idioma**.
+- Truco de 5 segundos: los carbos por 100 g delatan el estado (trigo ~75 g = crudo; 15-37 g = cocido).
+- Gate **135/135**; **9 mutaciones ROJAS** (déficit, formato ×3, track, marca del 100 %, badge, guía, tabla).
+
+### Dieta persistente — el día ya no se borra al refrescar (04/11/2026)
+
+- **El bug (medido)**: `DietModule` nacía con `meals` vacío y `cloudSync` solo INSERTABA en
+  `daily_meals`; **nadie leía la tabla**. Además `daily_meals` tenía **RLS activo SIN política**:
+  el insert fallaba con `42501` y solo se logueaba en consola. Resultado medido: **0 filas**.
+- **3 capas** (mismo criterio que la rutina): `src/logic/dieta.ts` (núcleo PURO: mapeo fila↔entrada,
+  caché y normalización) + `loadMealsForDate`/`saveMealDay` en `cloudSync.ts` (lee la fecha y guarda
+  por **REEMPLAZO**: borra + inserta) + `DietModule` (localStorage por día `user_meals_v1_<fecha>`,
+  debounce **600 ms** y **cola por comida** para que dos guardados no se pisen).
+- **Regla**: la caché de ESTE equipo manda para hoy; la nube es el respaldo multi-equipo. Sin caché,
+  al abrir se baja de la nube. Las filas no guardan `foodId`: se recupera por **NOMBRE** al llegar el
+  catálogo (también recalcula los macros con la tabla real).
+- **PASO MANUAL**: correr `supabase/2026-11-04_dieta_persistente.sql` (política RLS + índice).
+  Sin él la nube sigue rechazando escrituras, pero el navegador **igual conserva el día**.
+- Gate nuevo `scripts/verify-dieta.mjs` (**42 aserciones**) + `verify-metabolism.mjs` (**135**);
+  mutaciones `scripts/mutaciones-dieta.py` (**5/5 ROJAS por aserción**).

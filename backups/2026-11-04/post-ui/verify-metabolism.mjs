@@ -239,6 +239,15 @@ check('wiring: marca del 100%', DIET_SRC.includes('left-[99.5%]'), true);
 check('wiring: fila de deficit', DIET_SRC.includes('>Déficit</span>'), true);
 check('wiring: fila Te queda', DIET_SRC.includes('Te queda hoy'), true);
 check('wiring: 3 barras montadas', (DIET_SRC.match(/<BarraMacro/g) || []).length, 3);
+const AUTO_SRC = readFileSync(new URL('../src/components/AutocompleteFood.tsx', import.meta.url), 'utf8');
+const ESTADO_SRC = readFileSync(new URL('../src/components/EstadoAlimento.tsx', import.meta.url), 'utf8');
+check('wiring: badge unico CRUDO/COCIDO', ESTADO_SRC.includes("'Cocido' : 'Crudo'"), true);
+check('wiring: badge en el buscador', AUTO_SRC.includes('<EstadoAlimento esCocido={item.esCocido} />'), true);
+check('wiring: guia Como elijo', AUTO_SRC.includes('¿Cómo elijo?'), true);
+check('wiring: guia explica ingredientes', AUTO_SRC.includes('ingredientes'), true);
+check('wiring: guia con ejemplo del trigo', AUTO_SRC.includes('segundo de trigo'), true);
+check('wiring: badge tambien en la tabla', DIET_SRC.includes('<EstadoAlimento esCocido={f.esCocido} />'), true);
+
 
 console.log('=== Núcleo metabólico: verificación ===');
 console.log(filas.join('\n'));

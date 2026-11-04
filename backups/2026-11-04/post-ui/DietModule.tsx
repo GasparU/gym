@@ -4,6 +4,7 @@ import { AutocompleteFood } from "./AutocompleteFood";
 import { UserProfileCard } from "./UserProfileCard";
 import { computeMealTotals } from "../logic/auditor";
 import { numEs, numEsMax } from "../logic/formato";
+import { EstadoAlimento } from "./EstadoAlimento";
 import {
   calculateMetabolicTargets,
   repartoCalorico,
@@ -512,8 +513,22 @@ export const DietModule: React.FC = () => {
                   {meals[mealType].map((item) => (
                     <tr key={item.id} className="hover:bg-slate-700/30">
                       <td className="py-2 px-3 font-medium text-slate-200">
-                        {item.nombre}
-                      </td>
+
+                            <span className="inline-flex items-center gap-1.5">
+
+                              {item.nombre}
+
+                              {(() => {
+
+                                const f = foods.find((x) => x.id === item.foodId);
+
+                                return f ? <EstadoAlimento esCocido={f.esCocido} /> : null;
+
+                              })()}
+
+                            </span>
+
+                          </td>
                       <td className="py-2 px-3">
                         <input
                           type="number"

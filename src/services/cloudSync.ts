@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import type { UserProfile, MetabolicResult } from '../logic/metabolism';
 import type { MealEntry, MealType } from '../types/nutrition';
+import { entradasDesdeFilas, filasDesdeEntradas, type Meals } from '../logic/dieta';
 import type { ExerciseLog } from '../types/workout';
 
 // Obtener fecha actual en formato YYYY-MM-DD local
@@ -99,33 +100,52 @@ export async function loadLatestBodyMetrics(): Promise<Partial<UserProfile> | nu
   return perfil;
 }
 
-// 2. Guardar una comida registrada en el día
-export async function syncMealEntry(mealType: MealType, entry: MealEntry) {
-  const fecha = getTodayDateString();
-  const { error } = await supabase.from('daily_meals').insert({
-    fecha,
-    tipo_comida: mealType,
-    alimento_nombre: entry.nombre,
-    gramos: entry.gramos,
-    kcal: entry.kcal,
-    proteinas: entry.proteinas,
-    grasa: entry.grasa,
-    carbohidratos: entry.carbohidratos,
-    fibra: entry.fibra
-  });
+// 2. LEER el día completo (04/11/2026). Antes la tabla solo se ESCRIBÍA:
+//    `DietModule` arrancaba con `meals` vacío y un refresh borraba desayuno,
+//    almuerzo y cena. Devuelve null si la lectura falla: el llamador conserva
+//    la caché local y NUNCA borra lo que el usuario cargó.
+export async function loadMealsForDate(fecha: string): Promise<Meals | null> {
+  const { data, error } = await supabase
+    .from('daily_meals')
+    .select('*')
+    .eq('fecha', fecha)
+    .order('created_at', { ascending: true });
 
-  if (error) console.error('Error guardando alimento en Supabase:', error.message);
+  if (error) {
+    console.warn('No se pudo leer daily_meals:', error.message);
+    return null;
+  }
+  return entradasDesdeFilas(data ?? []);
 }
 
-// 3. Eliminar alimento en el día
-export async function removeCloudMeal(mealType: MealType, alimentoNombre: string) {
-  const fecha = getTodayDateString();
-  const { error } = await supabase
+// 3. GUARDAR una comida del día como REEMPLAZO (borra + inserta). Es idempotente
+//    y limpia duplicados de sesiones anteriores. Si el insert falla después del
+//    delete, la caché local conserva el día y el próximo cambio re-sincroniza.
+export async function saveMealDay(
+  fecha: string,
+  mealType: MealType,
+  entradas: MealEntry[],
+): Promise<boolean> {
+  const borrado = await supabase
     .from('daily_meals')
     .delete()
-    .match({ fecha, tipo_comida: mealType, alimento_nombre: alimentoNombre });
+    .match({ fecha, tipo_comida: mealType });
 
-  if (error) console.error('Error eliminando de Supabase:', error.message);
+  if (borrado.error) {
+    console.error('Error limpiando daily_meals:', borrado.error.message);
+    return false;
+  }
+  if (entradas.length === 0) return true;
+
+  const { error } = await supabase
+    .from('daily_meals')
+    .insert(filasDesdeEntradas(fecha, mealType, entradas));
+
+  if (error) {
+    console.error('Error guardando el día en Supabase:', error.message);
+    return false;
+  }
+  return true;
 }
 
 // 4. Guardar serie y volumen de entrenamiento

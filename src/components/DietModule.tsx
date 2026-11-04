@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import type { FoodItem, MealEntry, MealType } from "../types/nutrition";
 import { AutocompleteFood } from "./AutocompleteFood";
 import { UserProfileCard } from "./UserProfileCard";
 import { computeMealTotals } from "../logic/auditor";
 import { numEs, numEsMax } from "../logic/formato";
+import { EstadoAlimento } from "./EstadoAlimento";
 import {
   calculateMetabolicTargets,
   repartoCalorico,
@@ -12,10 +13,19 @@ import {
 } from "../logic/metabolism";
 import {
   syncBodyMetrics,
-  syncMealEntry,
-  removeCloudMeal,
   loadLatestBodyMetrics,
+  loadMealsForDate,
+  saveMealDay,
+  getTodayDateString,
 } from "../services/cloudSync";
+import {
+  claveCache,
+  leerCacheDe,
+  mealsVacio,
+  normalizarEntradas,
+  MEAL_TYPES,
+  type Meals,
+} from "../logic/dieta";
 
 // Datos reales del dueño (medidos el 03/11/2026): 99 kg, 175 cm, 44 a, 3 días.
 // El % de grasa (32,4) NO es un supuesto: sale de cintura 115 / cuello 44 por US Navy.
@@ -176,11 +186,80 @@ export const DietModule: React.FC = () => {
   // 2. Cálculo metabólico reactivo automático
   const targets = calculateMetabolicTargets(profile);
 
-  const [meals, setMeals] = useState<Record<MealType, MealEntry[]>>({
-    desayuno: [],
-    almuerzo: [],
-    cena: [],
-  });
+  // 2.b. DIETA PERSISTENTE (04/11/2026). Antes `meals` nacía vacío en cada
+  // render: no se leía de ningún lado y el refresh borraba el día. Ahora hay
+  // 3 capas: localStorage (instantáneo, offline), Supabase (multi-equipo) y
+  // el estado de React (lo que ves). La caché de ESTE equipo manda para hoy.
+  const fechaHoy = useMemo(() => getTodayDateString(), []);
+  const [meals, setMeals] = useState<Meals>(() =>
+    typeof window === "undefined"
+      ? mealsVacio()
+      : (leerCacheDe(window.localStorage.getItem(claveCache(getTodayDateString()))) ??
+        mealsVacio()),
+  );
+  const cambiosLocales = useRef(false);
+  const timersNube = useRef<Partial<Record<MealType, ReturnType<typeof setTimeout>>>>({});
+  const colasNube = useRef<Partial<Record<MealType, Promise<unknown>>>>({});
+  const [hidratado, setHidratado] = useState(false);
+
+  const guardarCache = (m: Meals) => {
+    try {
+      window.localStorage.setItem(claveCache(fechaHoy), JSON.stringify(m));
+    } catch {
+      /* modo privado o cuota llena: la nube sigue siendo el respaldo */
+    }
+  };
+
+  const programarNube = (mealType: MealType, entradas: MealEntry[]) => {
+    const previo = timersNube.current[mealType];
+    if (previo) clearTimeout(previo);
+    timersNube.current[mealType] = setTimeout(() => {
+      // Cola por comida: dos guardados seguidos no se pisan (delete + insert).
+      const anterior = colasNube.current[mealType] ?? Promise.resolve();
+      colasNube.current[mealType] = anterior
+        .then(() => saveMealDay(fechaHoy, mealType, entradas))
+        .catch(() => undefined);
+    }, 600);
+  };
+
+  const persistir = (m: Meals, mealType: MealType) => {
+    guardarCache(m);
+    programarNube(mealType, m[mealType]);
+  };
+
+  // Al abrir: si este equipo ya tiene el día en caché, MANDA la caché (y se
+  // sube, por si la nube quedó atrás). Si no, se baja de la nube.
+  useEffect(() => {
+    let vivo = true;
+    const local = leerCacheDe(window.localStorage.getItem(claveCache(fechaHoy)));
+    const localTiene = !!local && MEAL_TYPES.some((t) => local[t].length > 0);
+    loadMealsForDate(fechaHoy).then((nube) => {
+      if (!vivo || cambiosLocales.current) return;
+      if (localTiene && local) {
+        MEAL_TYPES.forEach((t) => {
+          if (local[t].length > 0) void saveMealDay(fechaHoy, t, local[t]);
+        });
+      } else if (nube) {
+        setMeals(nube);
+        guardarCache(nube);
+      }
+      setHidratado(true);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, [fechaHoy]);
+
+  // Cuando llega el catálogo se recupera el `foodId` por NOMBRE y se recalculan
+  // los macros con la tabla real (las filas de la nube no guardan foodId).
+  useEffect(() => {
+    if (foods.length === 0) return;
+    setMeals((prev) => {
+      const normalizado = normalizarEntradas(prev, foods);
+      guardarCache(normalizado);
+      return normalizado;
+    });
+  }, [foods, hidratado]);
 
   // Guardar perfil al actualizar
   const handleUpdateProfile = (newProfile: UserProfile) => {
@@ -227,19 +306,23 @@ export const DietModule: React.FC = () => {
       fibra: parseFloat((food.fibra * factor).toFixed(1)),
     };
 
-    setMeals((prev) => ({
-      ...prev,
-      [mealType]: [...prev[mealType], newEntry],
-    }));
-    syncMealEntry(mealType, newEntry);
+    const siguiente: Meals = {
+      ...meals,
+      [mealType]: [...meals[mealType], newEntry],
+    };
+    cambiosLocales.current = true;
+    setMeals(siguiente);
+    persistir(siguiente, mealType);
   };
 
   const updateGrams = (mealType: MealType, id: string, newGrams: number) => {
-    setMeals((prev) => ({
-      ...prev,
-      [mealType]: prev[mealType].map((item) => {
+    const siguiente: Meals = {
+      ...meals,
+      [mealType]: meals[mealType].map((item) => {
         if (item.id !== id) return item;
-        const foodRef = foods.find((f) => f.id === item.foodId);
+        const foodRef =
+          foods.find((f) => f.id === item.foodId) ??
+          foods.find((f) => f.nombre === item.nombre);
         if (!foodRef) return { ...item, gramos: newGrams };
 
         const factor = Math.max(0, newGrams) / 100;
@@ -255,18 +338,20 @@ export const DietModule: React.FC = () => {
           fibra: parseFloat((foodRef.fibra * factor).toFixed(1)),
         };
       }),
-    }));
+    };
+    cambiosLocales.current = true;
+    setMeals(siguiente);
+    persistir(siguiente, mealType);
   };
 
   const removeEntry = (mealType: MealType, id: string) => {
-    const itemToRemove = meals[mealType].find((m) => m.id === id);
-    if (itemToRemove) {
-      removeCloudMeal(mealType, itemToRemove.nombre);
-    }
-    setMeals((prev) => ({
-      ...prev,
-      [mealType]: prev[mealType].filter((item) => item.id !== id),
-    }));
+    const siguiente: Meals = {
+      ...meals,
+      [mealType]: meals[mealType].filter((item) => item.id !== id),
+    };
+    cambiosLocales.current = true;
+    setMeals(siguiente);
+    persistir(siguiente, mealType);
   };
 
   const allEntries = [...meals.desayuno, ...meals.almuerzo, ...meals.cena];
@@ -512,8 +597,22 @@ export const DietModule: React.FC = () => {
                   {meals[mealType].map((item) => (
                     <tr key={item.id} className="hover:bg-slate-700/30">
                       <td className="py-2 px-3 font-medium text-slate-200">
-                        {item.nombre}
-                      </td>
+
+                            <span className="inline-flex items-center gap-1.5">
+
+                              {item.nombre}
+
+                              {(() => {
+
+                                const f = foods.find((x) => x.id === item.foodId);
+
+                                return f ? <EstadoAlimento esCocido={f.esCocido} /> : null;
+
+                              })()}
+
+                            </span>
+
+                          </td>
                       <td className="py-2 px-3">
                         <input
                           type="number"

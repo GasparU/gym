@@ -25,6 +25,14 @@ MUTS = [
      "left-[99.5%]",
      "left-[100%]",
      "wiring: marca del 100%"),
+    ("M6 badge siempre Crudo", "src/components/EstadoAlimento.tsx",
+     "'Cocido' : 'Crudo'", "'Crudo' : 'Crudo'", "badge unico CRUDO/COCIDO"),
+    ("M7 sin badge en el buscador", "src/components/AutocompleteFood.tsx",
+     "<EstadoAlimento esCocido={item.esCocido} />", "{null}", "badge en el buscador"),
+    ("M8 sin la guia Como elijo", "src/components/AutocompleteFood.tsx",
+     "¿Cómo elijo?", "Ayuda", "guia Como elijo"),
+    ("M9 sin badge en la tabla", "src/components/DietModule.tsx",
+     "<EstadoAlimento esCocido={f.esCocido} />", "<span />", "badge tambien en la tabla"),
 ]
 
 def restaurar(rel):
