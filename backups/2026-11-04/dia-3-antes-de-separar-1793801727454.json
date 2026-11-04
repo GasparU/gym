@@ -1,0 +1,52 @@
+[
+  {
+    "id": "3cca58aa-829c-4f17-9ed4-ca12feeba6c0",
+    "created_at": "2026-11-04T00:11:22.764148+00:00",
+    "rutina_id": "dia-3",
+    "nombre": "Press Inclinado en Máquina o Mancuernas",
+    "calentamiento": "8-12 reps · 2,5-3 min · banco 30-45° (fibras claviculares)",
+    "peso": 0,
+    "series": 5,
+    "reps": 12
+  },
+  {
+    "id": "0fa05032-efaf-40fc-a91a-7dcfd47e8a96",
+    "created_at": "2026-11-04T00:11:22.764148+00:00",
+    "rutina_id": "dia-3",
+    "nombre": "Remo con Soporte de Pecho en Máquina",
+    "calentamiento": "8-12 reps · 2,5-3 min · pecho apoyado: anula la lumbar",
+    "peso": 0,
+    "series": 5,
+    "reps": 12
+  },
+  {
+    "id": "e2eee1ed-e924-45c8-a266-fb7cfcdaeb20",
+    "created_at": "2026-11-04T00:11:22.764148+00:00",
+    "rutina_id": "dia-3",
+    "nombre": "Prensa Inclinada de Piernas (repetición)",
+    "calentamiento": "12-15 reps · 3 min · volumen extra de tren inferior con estabilidad",
+    "peso": 0,
+    "series": 3,
+    "reps": 15
+  },
+  {
+    "id": "822f9c86-8872-47ef-80a1-217f88cd5cd0",
+    "created_at": "2026-11-04T00:11:22.764148+00:00",
+    "rutina_id": "dia-3",
+    "nombre": "Elevaciones Laterales con Mancuernas",
+    "calentamiento": "12-15 reps · 1,5 min · hasta la altura del hombro, codos suaves",
+    "peso": 0,
+    "series": 3,
+    "reps": 15
+  },
+  {
+    "id": "682323ac-5ce5-4b98-ba6b-b9764b6e5dd8",
+    "created_at": "2026-11-04T00:11:22.764148+00:00",
+    "rutina_id": "dia-3",
+    "nombre": "Superserie: Curl Martillo + Copa de Tríceps",
+    "calentamiento": "10-12 c/u · 1,5-2 min · sin descanso entre los dos ejercicios",
+    "peso": 0,
+    "series": 3,
+    "reps": 12
+  }
+]

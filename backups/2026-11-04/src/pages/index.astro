@@ -1,0 +1,112 @@
+---
+import '../styles/global.css';
+import { DietModule } from '../components/DietModule';
+import { WorkoutPanel } from '../components/WorkoutPanel';
+import { CardioStrengthCalculator } from '../components/CardioStrengthCalculator';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fitness & Nutrition Engine - Recomposición Corporal</title>
+  </head>
+  <body class="bg-slate-950 text-slate-100 min-h-screen">
+    <div id="app-container" class="max-w-6xl mx-auto px-4 py-6 text-sm">
+      <!-- Barra Superior -->
+      <header class="flex items-center justify-between pb-5 border-b border-slate-800 mb-6">
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-brand-500">
+            Recomposición & Hipertrofia
+          </h1>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Metabolismo (Katch-McArdle / Mifflin + Navy) &middot; 1RM 3 autores &middot; FC Tanaka 2001
+          </p>
+        </div>
+
+        <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-800 p-1 rounded-lg">
+          <button id="font-dec" class="px-2.5 py-1 text-xs font-bold text-slate-300 hover:text-white rounded">A-</button>
+          <button id="font-inc" class="px-2.5 py-1 text-xs font-bold text-slate-300 hover:text-white rounded">A+</button>
+        </div>
+      </header>
+
+      <!-- Pestañas de Navegación -->
+      <div class="flex gap-2 border-b border-slate-800 mb-6 overflow-x-auto">
+        <button id="tab-diet" class="tab-btn px-4 py-2.5 font-semibold text-xs border-b-2 border-brand-500 text-brand-400">
+          🍎 Control Dietético (927 Alimentos)
+        </button>
+        <button id="tab-workout" class="tab-btn px-4 py-2.5 font-semibold text-xs border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+          🏋️‍♂️ Rutina
+        </button>
+        <button id="tab-science" class="tab-btn px-4 py-2.5 font-semibold text-xs border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+          ❤️ FC Tanaka & 1RM (7 Autores)
+        </button>
+      </div>
+
+      <!-- Vistas -->
+      <main>
+        <div id="content-diet">
+          <DietModule client:load />
+        </div>
+        <div id="content-workout" class="hidden">
+          <WorkoutPanel client:load />
+        </div>
+        <div id="content-science" class="hidden">
+          <CardioStrengthCalculator edad={44} client:load />
+        </div>
+      </main>
+    </div>
+
+    <!-- Script de Pestañas -->
+    <script>
+      const tabDiet = document.getElementById('tab-diet')!;
+      const tabWorkout = document.getElementById('tab-workout')!;
+      const tabScience = document.getElementById('tab-science')!;
+
+      const contentDiet = document.getElementById('content-diet')!;
+      const contentWorkout = document.getElementById('content-workout')!;
+      const contentScience = document.getElementById('content-science')!;
+
+      const activeClass = 'tab-btn px-4 py-2.5 font-semibold text-xs border-b-2 border-brand-500 text-brand-400 transition-colors';
+      const inactiveClass = 'tab-btn px-4 py-2.5 font-semibold text-xs border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-colors';
+
+      tabDiet.addEventListener('click', () => {
+        tabDiet.className = activeClass;
+        tabWorkout.className = inactiveClass;
+        tabScience.className = inactiveClass;
+        contentDiet.classList.remove('hidden');
+        contentWorkout.classList.add('hidden');
+        contentScience.classList.add('hidden');
+      });
+
+      tabWorkout.addEventListener('click', () => {
+        tabWorkout.className = activeClass;
+        tabDiet.className = inactiveClass;
+        tabScience.className = inactiveClass;
+        contentWorkout.classList.remove('hidden');
+        contentDiet.classList.add('hidden');
+        contentScience.classList.add('hidden');
+      });
+
+      tabScience.addEventListener('click', () => {
+        tabScience.className = activeClass;
+        tabDiet.className = inactiveClass;
+        tabWorkout.className = inactiveClass;
+        contentScience.classList.remove('hidden');
+        contentDiet.classList.add('hidden');
+        contentWorkout.classList.add('hidden');
+      });
+
+      // Escalador A- / A+
+      const appContainer = document.getElementById('app-container')!;
+      let scale = 14;
+      document.getElementById('font-inc')?.addEventListener('click', () => {
+        if (scale < 18) { scale += 1; appContainer.style.fontSize = `${scale}px`; }
+      });
+      document.getElementById('font-dec')?.addEventListener('click', () => {
+        if (scale > 12) { scale -= 1; appContainer.style.fontSize = `${scale}px`; }
+      });
+    </script>
+  </body>
+</html>

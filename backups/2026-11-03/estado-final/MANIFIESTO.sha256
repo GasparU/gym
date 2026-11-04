@@ -1,0 +1,17 @@
+ba21f23b1fb97c9e887f444176cb5a116072a3fe391473cab8bd90917536fe8a *./AGENTS.md
+a636e0f91fa4756d1eb125da28ec78a76fe6af231903fd3df2e4931e184bc4ee *./DESFASES-EXCEL-VS-APP.md
+1ead2d4f1e42f7f49171b280864b45a2dfeadda1fb950291e5f1d7914d34ed72 *./scripts/check-supabase.mjs
+6fe6c6b2dfdeb9fe62cbf30002ed9a17a167d9e2e24d3f8b735c96d45f25537e *./scripts/sync-routine.mjs
+4d566e94bef1e849ed01ef9d9b30c8863bf9218ada073a3875771ac21178cd86 *./scripts/verify-metabolism.mjs
+5258599ee443496bced48de89ebb5b489d806f0d5aea49aa794b55e32bb46b2a *./src/components/BodyFatEstimator.tsx
+3096fa31ffa3e9beef7fffc8f22f22f71699026df4389ae702ce2ebcc4a80a51 *./src/components/DietModule.tsx
+00afc5127447e9cf4c24c550a3c76557aabca67051c367f22f3767bc22d42671 *./src/components/ErrorBoundary.tsx
+40b74fbdc793d1d3bc23c31fe2b3095108d2e337a2741dd7a19cd0894d8d2292 *./src/components/UserProfileCard.tsx
+2e1534ae5f47ee9baac86f02a10fce59e7597dcf3159100132aad815e3340c5e *./src/components/WorkoutModule.tsx
+c650ef8d53c72c551023ae4946d45cc62113e75ceaa779980a06714526945ad8 *./src/components/WorkoutPanel.tsx
+5efebd3a83938fa90f1b97cb53f28c44486a3396c32966605d9a58fb3acd0d45 *./src/logic/auditor.ts
+514eb4389140f0c4daec985ab7dddb5938e69e98621a58f8557af77bbb2b3777 *./src/logic/days.ts
+13e7d5dddadedf4ab56bb21a87da065011b0b41bd2e49f4f5ef542c1f176a450 *./src/logic/metabolism.ts
+c0e5a84d76df070caedc47085ce2f18860a8df6b14e95ae1435d2c50b41e958a *./src/logic/progress.ts
+2177323f1dada572d70df96103cb44f5af4094642d9c4188eebd42ef7747daf5 *./src/logic/routines.ts
+2e8fb2cf96d60a365f7868dc861e26c75706beb6ab0a2888bd18a43cd4cab85e *./src/pages/index.astro

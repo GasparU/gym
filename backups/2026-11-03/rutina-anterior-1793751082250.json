@@ -1,0 +1,122 @@
+[
+  {
+    "id": "b798ea50-8449-40f6-90b0-cf903220e0e2",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-1",
+    "nombre": "Press inclinado con mancuernas",
+    "calentamiento": "",
+    "peso": 20,
+    "series": 2,
+    "reps": 10
+  },
+  {
+    "id": "604bdeca-98a0-4e3c-b2d0-264faf6429d6",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-1",
+    "nombre": "Fondos",
+    "calentamiento": "",
+    "peso": 20,
+    "series": 2,
+    "reps": 10
+  },
+  {
+    "id": "0f9755dd-100d-419d-a608-e1f2ff8defdc",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-1",
+    "nombre": "Apertura con mancuernas",
+    "calentamiento": "",
+    "peso": 20,
+    "series": 2,
+    "reps": 12
+  },
+  {
+    "id": "a64ead20-c2e7-41a5-9bd7-cb3ffaeab5e5",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-2",
+    "nombre": "Sentadilla",
+    "calentamiento": "Al 50%, 3 reps",
+    "peso": 40,
+    "series": 3,
+    "reps": 10
+  },
+  {
+    "id": "ca7112c4-dc1d-4711-800a-edd994f99b1f",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-2",
+    "nombre": "Peso muerto rumano",
+    "calentamiento": "",
+    "peso": 20,
+    "series": 2,
+    "reps": 10
+  },
+  {
+    "id": "23a0c366-d4c0-4434-8940-ff686b0d579e",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-2",
+    "nombre": "Zancadas",
+    "calentamiento": "",
+    "peso": 30,
+    "series": 2,
+    "reps": 12
+  },
+  {
+    "id": "dc3ccfea-df09-4f98-9408-7697105ff113",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-2",
+    "nombre": "Elevación de talones",
+    "calentamiento": "",
+    "peso": 30,
+    "series": 2,
+    "reps": 12
+  },
+  {
+    "id": "46bee874-c83b-4bde-87b7-900e74205088",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-3",
+    "nombre": "Press Militar",
+    "calentamiento": "Al 50%, 3 reps",
+    "peso": 20,
+    "series": 3,
+    "reps": 10
+  },
+  {
+    "id": "ac014863-d6f9-4514-a5e0-afd5f43eacd8",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-3",
+    "nombre": "Elevaciones Laterales",
+    "calentamiento": "",
+    "peso": 16,
+    "series": 2,
+    "reps": 10
+  },
+  {
+    "id": "3a8d2d2f-b0d7-48f3-a78c-124b3e1e4dfa",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-3",
+    "nombre": "Curl de bíceps con mancuerna",
+    "calentamiento": "",
+    "peso": 20,
+    "series": 2,
+    "reps": 10
+  },
+  {
+    "id": "485d7b97-3ec0-429b-903a-dae1ac7b09d3",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-3",
+    "nombre": "Extensiones de tríceps",
+    "calentamiento": "",
+    "peso": 15,
+    "series": 2,
+    "reps": 10
+  },
+  {
+    "id": "4d66eea4-5b49-498e-8db2-7ea3b21f6639",
+    "created_at": "2026-11-03T14:57:57.389331+00:00",
+    "rutina_id": "dia-1",
+    "nombre": "Press de banca horizontal",
+    "calentamiento": "Al 50%, 1 reps",
+    "peso": 40,
+    "series": 5,
+    "reps": 8
+  }
+]
