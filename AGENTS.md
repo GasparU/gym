@@ -22,6 +22,28 @@ Detalle y mediciones: `DESFASES-EXCEL-VS-APP.md`.
 - **Carbohidratos de la tabla**: usar `carbohidratosTotales` (medido: 741/927 alimentos cuadran con la energía de la tabla; con `disponibles` solo 647, y 311 filas tienen disponibles = 0).
 - **Gate obligatorio tras tocar el núcleo**: `node scripts/verify-metabolism.mjs` (**114 aserciones** que importan el código real) + `node scripts/verify-semanas.mjs` (**54**) + `node scripts/check-supabase.mjs` (las tablas existen). Mutaciones: `py -3 scripts/mutaciones-04nov.py` (9/9 ROJAS por aserción).
 
+## Deploy (Vercel) — la configuración es OBLIGATORIA en el BUILD (04/11/2026)
+
+- **Las 2 variables tienen que existir en la máquina que compila:** `PUBLIC_SUPABASE_URL` y
+  `PUBLIC_SUPABASE_ANON_KEY`. El sitio es **estático**, así que Astro **incrusta** los `PUBLIC_*` en el
+  JS al compilar: no se leen en el navegador. Tener el `.env` local **no alcanza** para Vercel.
+- **Dónde se configuran:** Vercel → Settings → Environment Variables (Production + Preview +
+  Development) y después **Redeploy** (cambiar una variable NO reconstruye las builds viejas).
+- **Si faltan, el build FALLA a propósito** con:
+  `[Supabase no configurado] Faltan las DOS variables en el entorno de BUILD: ... Se configura en Vercel → ...`
+  **Falla en el build y no en el navegador**: un sitio publicado sin configurar se ve vacío y confunde.
+- **Núcleo puro:** `src/logic/supabase-config.ts` (`configSupabase(url, key)`) valida **presencia Y
+  formato** (Project URL vs. URL del panel; `eyJ...`/`sb_publishable_...` vs. pegar la service_role o
+  un snippet). `src/lib/supabase.ts` solo lo usa y tira el `Error` si no está ok.
+- **Gate:** `node scripts/verify-config-supabase.mjs` (**35 aserciones**, importa el código real).
+- **Antes** este archivo hacía `console.warn('⚠️ Variables de Supabase no detectadas')` y **la línea
+  siguiente explotaba** con `supabaseUrl is required` + 10 líneas de traza sin decir qué faltaba. Esa fue
+  la caída del deploy del 04/11/2026: el aviso era decorativo.
+- **`.env` está en `.gitignore:17`** (verificado con `git check-ignore`): no se filtró al repo.
+- **⚠️ Seguridad (decisión pendiente del dueño):** la `anon key` viaja en el JS del sitio y las tablas
+  tienen RLS `using (true)` → **cualquiera con el link puede leer y borrar los datos**. Opciones:
+  aceptarlo · Supabase Auth + RLS por usuario · protección de sitio de Vercel (plan pago).
+
 ## Documentation
 
 Full documentation: https://docs.astro.build

@@ -8,6 +8,7 @@ import sys
 RAIZ = 'D:/Personal Trainer Y Nutricion/fitness-saas/'
 SEMANAS = 'scripts/verify-semanas.mjs'
 METAB = 'scripts/verify-metabolism.mjs'
+CONFIG = 'scripts/verify-config-supabase.mjs'
 
 CRLF = chr(13) + chr(10)
 LF = chr(10)
@@ -41,6 +42,14 @@ MUTACIONES = [
      "", SEMANAS),
     ('M13 mover no renumera', 'src/logic/weeks.ts',
      'return { semanas: normalizarSemanas(movidas), motivo:', 'return { semanas: movidas, motivo:', SEMANAS),
+    ('M14 el mensaje no dice donde se configura', 'src/logic/supabase-config.ts',
+     "'Se configura en Vercel", "'Se configura", CONFIG),
+    ('M15 no reporta que falta la URL', 'src/logic/supabase-config.ts',
+     "if (!url) faltantes.push('PUBLIC_SUPABASE_URL');", '', CONFIG),
+    ('M16 no valida el formato de la URL', 'src/logic/supabase-config.ts',
+     'if (!urlValida(url)) {', 'if (false) {', CONFIG),
+    ('M17 acepta cualquier key', 'src/logic/supabase-config.ts',
+     '} else if (!keyValida(key)) {', '} else if (false) {', CONFIG),
 ]
 
 
@@ -77,6 +86,9 @@ try:
     if correr(METAB)[0] != 0:
         print('ABORTO: verify-metabolism no esta verde de base.')
         sys.exit(2)
+    if correr(CONFIG)[0] != 0:
+        print('ABORTO: verify-config-supabase no esta verde de base.')
+        sys.exit(2)
 
     for nombre, archivo, viejo, nuevo, script in MUTACIONES:
         original = leer(archivo)
@@ -101,8 +113,10 @@ finally:
     print('')
     cs, _ = correr(SEMANAS)
     cm, _ = correr(METAB)
+    cc, _ = correr(CONFIG)
     print('gate final verify-semanas    : ' + ('VERDE' if cs == 0 else 'ROJO'))
     print('gate final verify-metabolism : ' + ('VERDE' if cm == 0 else 'ROJO'))
+    print('gate final verify-config     : ' + ('VERDE' if cc == 0 else 'ROJO'))
     print('mutaciones ROJAS: %d de %d' % (rojas, len(MUTACIONES)))
 
 if verdes:
