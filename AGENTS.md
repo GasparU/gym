@@ -135,3 +135,23 @@ fuente de verdad.
   UN peso y el progreso mezclaba dos cargas. La superserie sigue escrita en la nota de cada uno.
   Se aplicó quirúrgicamente con `node scripts/split-superserie.mjs --apply` (renombra + inserta, **no**
   borra: conserva ids y pesos).
+
+## UI de nutrición — déficit visible, formato es-PE y barras con contenedor (04/11/2026)
+
+- **Renglón "Déficit"**: `MetabolicResult.deficitKcal` (nuevo, `tdee - metaCalorica`) se muestra ANTES de la
+  meta, con su % tomado de `deficitPctUsado`. El "-15 %" **ya era dinámico** (no había bug ahí).
+- **Formato**: `src/logic/formato.ts` (`numEs`, `numEsMax`) formatea en es-PE sin depender del locale del
+  runtime: `1.387`, `2,37`, `95,8`. Aplicado a TMB, TDEE, déficit, meta, consumo, Atwater, proteína g/kg y
+  reparto de macros. Antes se imprimía `2.3670053795576806`.
+- **Barras**: `BarraMacro` con track VISIBLE (`bg-slate-950 ring-1 ring-slate-600`), marca del 100 %
+  (`left-[99.5%]`), texto "faltan X g" y rojo al pasarse. Antes el track era `bg-slate-900` sobre tarjeta
+  `bg-slate-800/60`: mismo color, no se veía.
+- **Fila "Te queda hoy"**: kcal y g de proteína restantes (o "te pasaste por X").
+- **Gate**: `verify-metabolism.mjs` **129/129** (+15). **5 mutaciones ROJAS por aserción** (déficit,
+  separador de miles, recorte de ceros, track, marca del 100 %). Parche: `scripts/patch-ui-04nov.py`;
+  mutaciones: `scripts/mutaciones-ui-04nov.py`. Respaldo: `backups/2026-11-04/`.
+- **Límite declarado**: verificado por gate + `tsc` (0 errores propios) + `astro build`; el panel es
+  `client:load`, así que no hay clic real ni captura.
+- **Factor de actividad (decisión)**: 3 sesiones de 45-75 min + bici/caminata + trabajo sentado = **1,375
+  (Ligero)**, que es lo que dice `DESCRIPCION_ACTIVIDAD.LIGERO`. 1,55 (Moderado) pide 4-5 sesiones.
+  **No se cambió ningún default.** La calibración real es el promedio de peso semanal, no la tabla.

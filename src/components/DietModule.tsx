@@ -3,6 +3,7 @@ import type { FoodItem, MealEntry, MealType } from "../types/nutrition";
 import { AutocompleteFood } from "./AutocompleteFood";
 import { UserProfileCard } from "./UserProfileCard";
 import { computeMealTotals } from "../logic/auditor";
+import { numEs, numEsMax } from "../logic/formato";
 import {
   calculateMetabolicTargets,
   repartoCalorico,
@@ -34,6 +35,61 @@ const objetivoEtiqueta = (deficit: number): string =>
 
 const pctBarra = (valor: number, objetivo: number): number =>
   objetivo > 0 ? Math.min(100, (valor / objetivo) * 100) : 0;
+
+const BarraMacro: React.FC<{
+  nombre: string;
+  valor: number;
+  objetivo: number;
+  unidad: string;
+  colorTexto: string;
+  colorBarra: string;
+}> = ({ nombre, valor, objetivo, unidad, colorTexto, colorBarra }) => {
+  const pct = objetivo > 0 ? (valor / objetivo) * 100 : 0;
+  const lleno = pctBarra(valor, objetivo);
+  const excedido = pct > 100.5;
+  const falta = Math.max(0, objetivo - valor);
+  const sobra = Math.max(0, valor - objetivo);
+  return (
+    <div>
+      <div className="flex justify-between text-xs mb-1">
+        <span className={`${colorTexto} font-medium`}>{nombre}</span>
+        <span className="text-slate-300">
+          {numEsMax(valor, 1)} / {numEs(objetivo)} {unidad}
+        </span>
+      </div>
+      <div
+        className="relative w-full bg-slate-950 ring-1 ring-slate-600 rounded-full h-2.5 overflow-hidden"
+        role="progressbar"
+        aria-valuenow={Math.min(100, Math.round(pct))}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`${nombre}: ${numEsMax(valor, 1)} de ${numEs(objetivo)} ${unidad}`}
+      >
+        <div
+          className={`${
+            excedido ? "bg-rose-500" : colorBarra
+          } h-2.5 rounded-full transition-all`}
+          style={{ width: `${lleno}%` }}
+        />
+        <span
+          className="absolute inset-y-0 left-[99.5%] w-px bg-slate-300/80"
+          aria-hidden="true"
+        />
+      </div>
+      <div className="flex justify-between text-[10px] mt-1">
+        <span className={excedido ? "text-rose-400" : "text-slate-500"}>
+          {excedido
+            ? `+${numEsMax(sobra, 1)} ${unidad} sobre el objetivo`
+            : `faltan ${numEsMax(falta, 1)} ${unidad}`}
+        </span>
+        <span className={excedido ? "text-rose-400" : "text-slate-500"}>
+          {numEs(pct)} %
+        </span>
+      </div>
+    </div>
+  );
+};
+
 
 // Migración única (03/11/2026): si el perfil guardado es EXACTAMENTE el default
 // viejo (98 kg, sin % de grasa, sin nivel de actividad), se pasa a los datos
@@ -241,16 +297,20 @@ export const DietModule: React.FC = () => {
       )}
 
           {/* 2. Resumen de Metas Diarias */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 bg-slate-800/80 p-4 rounded-xl border border-slate-700">
             <div>
               <span className="text-xs text-slate-400 block">TMB Activa</span>
               <span className="text-xl font-bold text-slate-100">
-                {targets.tmb} kcal
+                {numEs(targets.tmb)} kcal
               </span>
               <span className="text-[10px] text-emerald-400 block">
                 {targets.formulaTmb === "KATCH_MCARDLE"
-                  ? `Katch-McArdle · MLG ${targets.masaLibreGrasa} kg`
-                  : `Mifflin-St Jeor · ${profile.peso} kg (peso real)`}
+                  ? `Katch-McArdle · MLG ${
+                        targets.masaLibreGrasa !== null
+                          ? numEsMax(targets.masaLibreGrasa, 2)
+                          : "—"
+                      } kg`
+                  : `Mifflin-St Jeor · ${numEsMax(profile.peso, 1)} kg (peso real)`}
               </span>
             </div>
             <div>
@@ -258,7 +318,7 @@ export const DietModule: React.FC = () => {
                 Gasto Total (TDEE)
               </span>
               <span className="text-xl font-bold text-slate-100">
-                {targets.tdee} kcal
+                {numEs(targets.tdee)} kcal
               </span>
               <span className="text-[10px] text-slate-400 block">
                 {targets.factorActividadFuente === "DIAS"
@@ -271,12 +331,21 @@ export const DietModule: React.FC = () => {
               </span>
             </div>
             <div>
+              <span className="text-xs text-slate-400 block">Déficit</span>
+              <span className="text-xl font-bold text-rose-400">
+                −{numEs(targets.deficitKcal)} kcal
+              </span>
+              <span className="text-[10px] text-slate-400 block">
+                −{numEs(targets.deficitPctUsado * 100)} % del gasto total
+              </span>
+            </div>
+            <div>
               <span className="text-xs text-slate-400 block">
                 Meta {objetivoEtiqueta(targets.deficitPctUsado)} (−
-                {Math.round(targets.deficitPctUsado * 100)}%)
+                {numEs(targets.deficitPctUsado * 100)} %)
               </span>
               <span className="text-xl font-bold text-amber-400">
-                {targets.metaCalorica} kcal
+                {numEs(targets.metaCalorica)} kcal
               </span>
               <span className="text-[10px] text-slate-400 block">
                 Presupuesto diario
@@ -287,11 +356,11 @@ export const DietModule: React.FC = () => {
                 Consumo Registrado
               </span>
               <span className="text-xl font-bold text-emerald-400">
-                {totalAudit.energiaTablaKcal} kcal
+                {numEs(totalAudit.energiaTablaKcal)} kcal
               </span>
               <span className="text-[10px] text-slate-400 block">
-                Atwater: {totalAudit.energiaAtwaterKcal} kcal · Δ {" "}
-                {totalAudit.diferenciaKcal} kcal (tol. {totalAudit.toleranciaKcal})
+                Atwater: {numEs(totalAudit.energiaAtwaterKcal)} kcal · Δ {" "}
+                {numEs(totalAudit.diferenciaKcal)} kcal (tol. {numEs(totalAudit.toleranciaKcal)})
               </span>
               <span
                 className={`text-[10px] block font-semibold ${
@@ -320,12 +389,12 @@ export const DietModule: React.FC = () => {
               <span>
                 Reparto:{" "}
                 <b className="text-slate-200">
-                  {reparto.proteina}% proteína · {reparto.grasa}% grasa ·{" "}
-                  {reparto.carbohidratos}% carbohidratos
+                  {numEsMax(reparto.proteina, 1)} % proteína · {numEsMax(reparto.grasa, 1)} % grasa ·{" "}
+                  {numEsMax(reparto.carbohidratos, 1)} % carbohidratos
                 </b>
               </span>
               <span>
-                Proteína: <b className="text-slate-200">{targets.proteinaFactorGkg} g/kg</b>{" "}
+                Proteína: <b className="text-slate-200">{numEs(targets.proteinaFactorGkg, 2)} g/kg</b>{" "}
                 sobre {targets.proteinaBaseG} kg{" "}
                 {targets.masaLibreGrasa !== null ? "(masa libre de grasa)" : "(peso real)"}
               </span>
@@ -343,65 +412,64 @@ export const DietModule: React.FC = () => {
             )}
           </div>
 
-      {/* 3. Barras de Progreso de Macronutrientes */}
+      {/* 3. Balance de macronutrientes: barra contenedora + cuanto falta */}
+      {(() => {
+        const restanteKcal = targets.metaCalorica - totalAudit.energiaTablaKcal;
+        const restanteProteina = targets.targetProteinaG - totalAudit.proteinasG;
+        const pasado = restanteKcal < 0;
+        return (
+          <div
+            className={`rounded-xl border p-3 text-sm ${
+              pasado
+                ? "border-rose-700 bg-rose-950/40 text-rose-300"
+                : "border-emerald-700 bg-emerald-950/40 text-emerald-300"
+            }`}
+          >
+            {pasado ? (
+              <>
+                Te pasaste del presupuesto por{" "}
+                <b>{numEs(-restanteKcal)} kcal</b>.
+              </>
+            ) : (
+              <>
+                Te queda hoy: <b>{numEs(restanteKcal)} kcal</b> ·{" "}
+                <b>{numEsMax(Math.max(0, restanteProteina), 1)} g de proteína</b>.
+              </>
+            )}
+          </div>
+        );
+        })()}
       <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700 space-y-3">
         <h3 className="text-sm font-semibold text-slate-200">
           Balance de Macronutrientes del Día
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-blue-400 font-medium">Proteínas</span>
-              <span className="text-slate-300">
-                {totalAudit.proteinasG} / {targets.targetProteinaG} g
-              </span>
-            </div>
-            <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
-              <div
-                className="bg-blue-500 h-2 rounded-full transition-all"
-                style={{
-                  width: `${pctBarra(totalAudit.proteinasG, targets.targetProteinaG)}%`,
-                }}
-              />
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-amber-400 font-medium">Grasas</span>
-              <span className="text-slate-300">
-                {totalAudit.grasaG} / {targets.targetGrasaG} g
-              </span>
-            </div>
-            <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
-              <div
-                className="bg-amber-500 h-2 rounded-full transition-all"
-                style={{
-                  width: `${pctBarra(totalAudit.grasaG, targets.targetGrasaG)}%`,
-                }}
-              />
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-emerald-400 font-medium">
-                Carbohidratos
-              </span>
-              <span className="text-slate-300">
-                {totalAudit.carbohidratosG} / {targets.targetCarbohidratosG} g
-              </span>
-            </div>
-            <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
-              <div
-                className="bg-emerald-500 h-2 rounded-full transition-all"
-                style={{
-                  width: `${pctBarra(totalAudit.carbohidratosG, targets.targetCarbohidratosG)}%`,
-                }}
-              />
-            </div>
-          </div>
+          <BarraMacro
+            nombre="Proteínas"
+            valor={totalAudit.proteinasG}
+            objetivo={targets.targetProteinaG}
+            unidad="g"
+            colorTexto="text-blue-400"
+            colorBarra="bg-blue-500"
+          />
+          <BarraMacro
+            nombre="Grasas"
+            valor={totalAudit.grasaG}
+            objetivo={targets.targetGrasaG}
+            unidad="g"
+            colorTexto="text-amber-400"
+            colorBarra="bg-amber-500"
+          />
+          <BarraMacro
+            nombre="Carbohidratos"
+            valor={totalAudit.carbohidratosG}
+            objetivo={targets.targetCarbohidratosG}
+            unidad="g"
+            colorTexto="text-emerald-400"
+            colorBarra="bg-emerald-500"
+          />
         </div>
       </div>
-
       {/* 4. Tablas por Comida */}
       {(["desayuno", "almuerzo", "cena"] as MealType[]).map((mealType) => (
         <div

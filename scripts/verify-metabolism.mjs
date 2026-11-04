@@ -9,6 +9,8 @@ import {
   estimarGrasaNavy,
 } from '../src/logic/metabolism.ts';
 import { computeMealTotals } from '../src/logic/auditor.ts';
+import { numEs, numEsMax } from '../src/logic/formato.ts';
+import { readFileSync } from 'node:fs';
 import { RUTINA, DIAS_INICIALES, filasParaInsertar, seriesPorGrupo } from '../src/logic/routines.ts';
 import {
   normalizarDias,
@@ -218,6 +220,25 @@ const filas = [A, B, C, D, R].map((r, i) => {
     `TMB ${String(r.tmb).padStart(5)}  TDEE ${String(r.tdee).padStart(5)}  meta ${String(r.metaCalorica).padStart(5)}  ` +
     `P ${String(r.targetProteinaG).padStart(3)}g (${p.proteina}%)  G ${String(r.targetGrasaG).padStart(3)}g (${p.grasa}%)  C ${String(r.targetCarbohidratosG).padStart(3)}g (${p.carbohidratos}%)  [${r.formulaTmb}]`;
 });
+
+// ---------- Formato es-PE y deficit visible (04/11/2026) ----------
+check('formato: 1.387 con separador de miles', numEs(1387), '1.387');
+check('formato: 2,37 con 2 decimales', numEs(2.3670053795576806, 2), '2,37');
+check('formato: negativo', numEs(-374), '-374');
+check('formato: redondeo de 1386,9', numEs(1386.9), '1.387');
+check('formato: 95,8 sin cero de cola', numEsMax(95.8, 1), '95,8');
+check('formato: 95,8 recorta el cero con 2 decimales', numEsMax(95.8, 2), '95,8');
+check('formato: 300 entero sin coma', numEsMax(300, 1), '300');
+check('formato: los ceros de miles no se recortan', numEsMax(1000, 1), '1.000');
+check('deficit: tdee - meta', A.deficitKcal, A.tdee - A.metaCalorica);
+check('deficit: perfil real', R.deficitKcal, R.tdee - R.metaCalorica);
+
+const DIET_SRC = readFileSync(new URL('../src/components/DietModule.tsx', import.meta.url), 'utf8');
+check('wiring: barra con contenedor visible', DIET_SRC.includes('bg-slate-950 ring-1 ring-slate-600'), true);
+check('wiring: marca del 100%', DIET_SRC.includes('left-[99.5%]'), true);
+check('wiring: fila de deficit', DIET_SRC.includes('>Déficit</span>'), true);
+check('wiring: fila Te queda', DIET_SRC.includes('Te queda hoy'), true);
+check('wiring: 3 barras montadas', (DIET_SRC.match(/<BarraMacro/g) || []).length, 3);
 
 console.log('=== Núcleo metabólico: verificación ===');
 console.log(filas.join('\n'));

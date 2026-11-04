@@ -98,6 +98,7 @@ export interface MetabolicResult {
   factorActividadFuente: 'NIVEL' | 'DIAS';
   deficitPctUsado: number;
   metaCalorica: number;
+  deficitKcal: number; // tdee - meta (positivo = lo que recortas)
   proteinaBaseG: number; // base sobre la que se calculó la proteína
   proteinaFactorGkg: number;
   targetProteinaG: number;
@@ -218,6 +219,7 @@ export function calculateMetabolicTargets(u: UserProfile): MetabolicResult {
   }
 
   const metaCalorica = redondear(tdee * (1 - deficitPctUsado));
+  const deficitKcal = Math.round(tdee - metaCalorica);
 
   // 4) Proteína en g/kg (nunca %). Dos pisos y se toma el mayor:
   //    - 2,3 g/kg de masa libre de grasa (Helms 2014: 2,3-3,1 en déficit)
@@ -279,6 +281,7 @@ export function calculateMetabolicTargets(u: UserProfile): MetabolicResult {
     factorActividadFuente,
     deficitPctUsado,
     metaCalorica,
+    deficitKcal,
     proteinaBaseG,
     proteinaFactorGkg,
     targetProteinaG,
