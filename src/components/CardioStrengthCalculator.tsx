@@ -1,10 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
-  edad: number;
+  edad?: number;
 }
 
-export const CardioStrengthCalculator: React.FC<Props> = ({ edad }) => {
+export const CardioStrengthCalculator: React.FC<Props> = ({ edad: edadProp }) => {
+  const CLAVE_PERFIL = 'user_metabolic_profile';
+  const EDAD_POR_DEFECTO = 44;
+  const [edad, setEdad] = useState<number>(
+    edadProp && edadProp > 0 ? edadProp : EDAD_POR_DEFECTO,
+  );
+  const [edadFuente, setEdadFuente] = useState<'prop' | 'perfil' | 'defecto'>(
+    edadProp && edadProp > 0 ? 'prop' : 'defecto',
+  );
+
+  // La edad REAL sale del perfil guardado; el prop queda solo como respaldo.
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(CLAVE_PERFIL);
+      const e = raw ? JSON.parse(raw)?.edad : null;
+      if (typeof e === 'number' && Number.isFinite(e) && e >= 10 && e <= 100) {
+        setEdad(e);
+        setEdadFuente('perfil');
+      }
+    } catch {
+      /* perfil ilegible: se usa el respaldo */
+    }
+  }, []);
+
   // Fórmulas de FC Máxima según tu Excel
   const fcmTanaka = Math.round(208.75 - 0.7 * edad);
   const fcmTradicional = 220 - edad;
@@ -96,7 +119,7 @@ export const CardioStrengthCalculator: React.FC<Props> = ({ edad }) => {
               <span>❤️</span> Tabla de Frecuencia Cardíaca & Zonas de Combustible
             </h3>
             <p className="text-xs text-slate-400">
-              Cálculo para {edad} años basado en la fórmula oficial Tanaka 2001
+              Cálculo para {edad} años{edadFuente === 'perfil' ? ' (según tu perfil)' : ''} con la fórmula Tanaka 2001
             </p>
           </div>
           <div className="flex gap-2">

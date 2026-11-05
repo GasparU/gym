@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BodyFatEstimator } from './BodyFatEstimator';
 import {
   DESCRIPCION_ACTIVIDAD,
+  DIAS_POR_NIVEL,
   ETIQUETAS_ACTIVIDAD,
   descripcionActividadAutomatica,
   factorPorDias,
@@ -155,14 +156,26 @@ export const UserProfileCard: React.FC<Props> = ({ profile, targets, onUpdatePro
                     </option>
                   ))}
                 </select>
-                <p className="text-[10px] leading-snug text-slate-500 mt-1">
-                  {formData.nivelActividad
-                    ? DESCRIPCION_ACTIVIDAD[formData.nivelActividad]
-                    : descripcionActividadAutomatica(
-                        formData.diasEntrenamiento,
-                        factorPorDias(formData.diasEntrenamiento),
-                      )}
-                </p>
+                <div className="mt-1.5 rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-2">
+                  <div className="flex items-center gap-2">
+                    <span className="shrink-0 rounded bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-bold text-brand-300">
+                      {formData.nivelActividad
+                        ? DIAS_POR_NIVEL[formData.nivelActividad]
+                        : `${formData.diasEntrenamiento} días/sem`}
+                    </span>
+                    <span className="text-[10px] text-slate-500">
+                      {formData.nivelActividad ? 'referencia del nivel' : 'automático por días de gym'}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-[11px] leading-snug text-slate-400">
+                    {formData.nivelActividad
+                      ? DESCRIPCION_ACTIVIDAD[formData.nivelActividad]
+                      : descripcionActividadAutomatica(
+                          formData.diasEntrenamiento,
+                          factorPorDias(formData.diasEntrenamiento),
+                        )}
+                  </p>
+                </div>
               </div>
 
               <div>

@@ -465,6 +465,14 @@ export const DietModule: React.FC = () => {
             </div>
           </div>
 
+              {/* 2.a Agua diaria (fórmula del Excel: 35 ml/kg o peso ideal si IMC ≥ 30) */}
+              <div className="rounded-xl border border-sky-800/60 bg-sky-950/30 px-4 py-2.5 text-sm text-sky-200 flex flex-wrap items-baseline gap-x-2">
+                <span>💧 Agua: <b>{numEsMax(targets.aguaLitros, 1)} L/día</b></span>
+                <span className="text-[11px] text-sky-300/80">
+                  + 0,5 L por cada hora de entrenamiento
+                </span>
+              </div>
+
           {/* 2.b Cómo se calcularon las metas (trazabilidad) */}
           <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
             <h3 className="text-sm font-semibold text-slate-200 mb-2">

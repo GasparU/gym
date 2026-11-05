@@ -4,6 +4,10 @@
 import {
   calculateMetabolicTargets,
   factorPorDias,
+  aguaDiariaLitros,
+  AGUA_ML_POR_HORA_ACTIVIDAD,
+  DIAS_POR_NIVEL,
+  ETIQUETAS_ACTIVIDAD,
   repartoCalorico,
   clasificarImc,
   estimarGrasaNavy,
@@ -65,6 +69,22 @@ check('B.meta', B.metaCalorica, 2213);
 check('B.proteina', B.targetProteinaG, 162);
 check('B.grasa', B.targetGrasaG, 53);
 check('B.carbs', B.targetCarbohidratosG, 272);
+
+// ---------- Agua diaria (fórmula del Excel: 35 ml/kg o peso ideal si IMC >= 30) ----------
+check('Agua A (IMC 32: usa peso ideal)', A.aguaLitros, 2.5, 0.001);
+check('Agua B (mismo peso, con grasa)', B.aguaLitros, 2.5, 0.001);
+const IMC_NORMAL = calculateMetabolicTargets({
+  peso: 80, talla: 175, edad: 40, sexo: 'H', diasEntrenamiento: 2,
+});
+check('Agua IMC < 30 (35 ml/kg)', IMC_NORMAL.aguaLitros, 2.8, 0.001);
+check('Agua pura 35 ml/kg', aguaDiariaLitros(80, 26.12, 73.5), 2.8, 0.001);
+check('Agua peso 0', aguaDiariaLitros(0, 20, 70), 0);
+check('Agua redondeo a 1 decimal', aguaDiariaLitros(73, 24, 73), 2.6, 0.001);
+check('Agua ml por hora', AGUA_ML_POR_HORA_ACTIVIDAD, 500);
+check('Agua aviso sobrepeso', A.avisos.some((a) => a.includes('fórmula de sobrepeso')), true);
+check('Agua sin aviso con IMC normal', IMC_NORMAL.avisos.some((a) => a.includes('fórmula de sobrepeso')), false);
+check('Dias por nivel MODERADO', DIAS_POR_NIVEL.MODERADO, '4-5 días/sem');
+check('Etiqueta LIGERO muestra los dias', ETIQUETAS_ACTIVIDAD.LIGERO.includes('2-3 días/sem'), true);
 
 // ---------- Factor de actividad explícito ----------
 const C = calculateMetabolicTargets({

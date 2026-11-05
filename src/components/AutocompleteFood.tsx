@@ -26,24 +26,34 @@ export const AutocompleteFood: React.FC<AutocompleteProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [ayuda, setAyuda] = useState(false);
+  const [filtroSaciedad, setFiltroSaciedad] = useState(false);
+  const [filtroProteina, setFiltroProteina] = useState(false);
+  const [filtroFibra, setFiltroFibra] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const q = normalize(query.trim());
-    if (q.length < 2) {
+    const hayFiltro = filtroSaciedad || filtroProteina || filtroFibra;
+    if (q.length < 2 && !hayFiltro) {
       setResults([]);
       setIsOpen(false);
       return;
     }
 
     const filtered = foods
-      .filter((item) => normalize(item.nombre).includes(q))
-      .slice(0, 10); // Límite de 10 resultados para rendimiento visual
+      .filter((item) => {
+        if (q.length >= 2 && !normalize(item.nombre).includes(q)) return false;
+        if (filtroSaciedad && item.saciedad !== 'Alta') return false;
+        if (filtroProteina && !item.altoProteina) return false;
+        if (filtroFibra && !item.altaFibra) return false;
+        return true;
+      })
+      .slice(0, 10);
 
     setResults(filtered);
     setIsOpen(filtered.length > 0);
     setHighlightedIndex(-1);
-  }, [query, foods]);
+  }, [query, foods, filtroSaciedad, filtroProteina, filtroFibra]);
 
   // Cierre al hacer clic fuera del componente
   useEffect(() => {
@@ -92,6 +102,27 @@ export const AutocompleteFood: React.FC<AutocompleteProps> = ({
         className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-500 transition-colors"
       />
 
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {[
+              { on: filtroSaciedad, set: setFiltroSaciedad, label: 'Llena más' },
+              { on: filtroProteina, set: setFiltroProteina, label: '+ Proteína' },
+              { on: filtroFibra, set: setFiltroFibra, label: '+ Fibra' },
+            ].map(({ on, set, label }) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => set((v) => !v)}
+                aria-pressed={on}
+                className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold transition-colors ${' '}
+                  on
+                    ? 'border-emerald-600 bg-emerald-900/40 text-emerald-300'
+                    : 'border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
                     <div className="mt-1 flex items-center justify-between gap-2 text-[10px] text-slate-500">
             <span>
               Pesá crudo lo que sale de la bolsa · si el nombre dice COCIDO, pesá el plato
@@ -148,6 +179,28 @@ export const AutocompleteFood: React.FC<AutocompleteProps> = ({
                   <span className="text-xs text-slate-400">
                     P: {item.proteinas}g | C: {item.carbohidratosTotales}g | G: {item.grasaTotal}g (por 100g)
                   </span>
+                      <div className="mt-0.5 flex flex-wrap gap-1">
+                        {item.saciedad === 'Alta' && (
+                          <span className="rounded bg-emerald-900/50 px-1 py-px text-[9px] font-semibold text-emerald-300">
+                            Llena
+                          </span>
+                        )}
+                        {item.glucemia === 'Alta' && (
+                          <span className="rounded bg-amber-900/50 px-1 py-px text-[9px] font-semibold text-amber-300">
+                            Sube azúcar
+                          </span>
+                        )}
+                        {item.altoProteina && (
+                          <span className="rounded bg-sky-900/50 px-1 py-px text-[9px] font-semibold text-sky-300">
+                            Prot.
+                          </span>
+                        )}
+                        {item.altaFibra && (
+                          <span className="rounded bg-teal-900/50 px-1 py-px text-[9px] font-semibold text-teal-300">
+                            Fibra
+                          </span>
+                        )}
+                      </div>
                 </div>
                 <div className="flex items-center gap-2">
 

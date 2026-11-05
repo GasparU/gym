@@ -183,3 +183,32 @@ fuente de verdad.
   Sin él la nube sigue rechazando escrituras, pero el navegador **igual conserva el día**.
 - Gate nuevo `scripts/verify-dieta.mjs` (**42 aserciones**) + `verify-metabolism.mjs` (**135**);
   mutaciones `scripts/mutaciones-dieta.py` (**5/5 ROJAS por aserción**).
+
+## Clasificación de alimentos, agua y actividad (04/11/2026)
+
+- **La "mina de oro" es `AlimentosClasificados.xlsx`, NO el PDF.** Aporta **5 columnas que el JSON no tenia**:
+  `saciedad` (Alta/Media/Baja), `glucemia` (Alta/Media/Baja/`null` = "No definido"), `cargaGlucemica`
+  (139/927 con dato), `altoProteina` y `altaFibra` (booleanos). **NO trae micronutrientes**: esos solo
+  existen en `tablas-peruanas-QR.pdf` (22 columnas, la tabla va partida en **2 paginas** y se une por
+  **CODIGO**, nunca por posicion).
+  - `scripts/merge-clasificados.mjs` (idempotente) une por **NOMBRE** (927/927, sin duplicados), valida
+    allowlists y **no toca** los 9 campos originales (medido: 0 alterados). Backup:
+    `backups/2026-11-04/foods.json.bak`.
+  - **Buscador**: 3 chips (`Llena mas`, `+ Proteina`, `+ Fibra`) + badges por resultado (`Llena`,
+    `Sube azucar`, `Prot.`, `Fibra`). Con un chip activo y sin texto, muestra los primeros 10.
+  - Gates `scripts/verify-alimentos.mjs` (**34**) + `scripts/verify-wiring.mjs` (**20**);
+    `scripts/mutaciones-clasificacion.py` (**7/7 ROJAS por asercion**).
+- **Agua diaria (formula del Excel `Objetivos!X26/X27`)**: IMC < 30 -> `35 ml x kg`; IMC >= 30 ->
+  `(peso ideal x 30 + (peso real - peso ideal) x 10) / 1000`. Redondeo a **1 decimal**. El
+  **+0,5 L por hora de entrenamiento** se declara aparte (`AGUA_ML_POR_HORA_ACTIVIDAD = 500`) y NO se suma
+  solo. Cuando se usa la formula de sobrepeso, se agrega un **aviso** (trazabilidad). **No hay contador de
+  vasos** (pendiente declarado).
+- **Selector "Actividad total (trabajo + gym)"**: cada opcion ahora muestra **los dias**
+  (`Ligero x1,375 - 2-3 dias/sem`) y debajo un recuadro con el badge de dias + la descripcion.
+  `DIAS_POR_NIVEL` en `metabolism.ts` es la fuente unica.
+- **BUG corregido**: `CardioStrengthCalculator` recibia `edad={44}` **fija** desde `index.astro` (las
+  zonas cardiacas no seguian al perfil). Ahora lee `user_metabolic_profile` de `localStorage` y declara
+  "segun tu perfil"; el prop queda solo como respaldo.
+- **Pendientes declarados** (estaban en los Excel, NO implementados): **ETA/TEF** (~7,8 %, informativo),
+  **antropometria** (12 pliegues/perimetros del `Historial Dietetico`), **contador de agua** y **platos
+  peruanos** (propuesta: recetas con ingredientes reales + porcion ajustada al presupuesto restante).

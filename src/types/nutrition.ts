@@ -10,6 +10,12 @@ export interface FoodItem {
   carbohidratosDisponibles: number;
   fibra: number;
   esCocido: boolean;
+  /** Clasificación de calidad (AlimentosClasificados.xlsx). Opcional: no rompe objetos viejos. */
+  saciedad?: 'Alta' | 'Media' | 'Baja';
+  glucemia?: 'Alta' | 'Media' | 'Baja' | null;
+  cargaGlucemica?: number | null;
+  altoProteina?: boolean;
+  altaFibra?: boolean;
 }
 
 export interface MealEntry {

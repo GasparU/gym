@@ -32,12 +32,20 @@ export const NOMBRES_ACTIVIDAD: Record<NivelActividad, string> = {
 
 const conComa = (n: number): string => String(n).replace('.', ',');
 
+/** Cuántos días de entrenamiento corresponde a cada nivel (para el selector). */
+export const DIAS_POR_NIVEL: Record<NivelActividad, string> = {
+  SEDENTARIO: '0 días/sem',
+  LIGERO: '2-3 días/sem',
+  MODERADO: '4-5 días/sem',
+  INTENSO: '6-7 días/sem',
+};
+
 /** Etiqueta corta para el <select>: nombre + multiplicador. */
 export const ETIQUETAS_ACTIVIDAD: Record<NivelActividad, string> = {
-  SEDENTARIO: `${NOMBRES_ACTIVIDAD.SEDENTARIO} ×${conComa(FACTORES_ACTIVIDAD.SEDENTARIO)}`,
-  LIGERO: `${NOMBRES_ACTIVIDAD.LIGERO} ×${conComa(FACTORES_ACTIVIDAD.LIGERO)}`,
-  MODERADO: `${NOMBRES_ACTIVIDAD.MODERADO} ×${conComa(FACTORES_ACTIVIDAD.MODERADO)}`,
-  INTENSO: `${NOMBRES_ACTIVIDAD.INTENSO} ×${conComa(FACTORES_ACTIVIDAD.INTENSO)}`,
+  SEDENTARIO: `${NOMBRES_ACTIVIDAD.SEDENTARIO} ×${conComa(FACTORES_ACTIVIDAD.SEDENTARIO)} · ${DIAS_POR_NIVEL.SEDENTARIO}`,
+  LIGERO: `${NOMBRES_ACTIVIDAD.LIGERO} ×${conComa(FACTORES_ACTIVIDAD.LIGERO)} · ${DIAS_POR_NIVEL.LIGERO}`,
+  MODERADO: `${NOMBRES_ACTIVIDAD.MODERADO} ×${conComa(FACTORES_ACTIVIDAD.MODERADO)} · ${DIAS_POR_NIVEL.MODERADO}`,
+  INTENSO: `${NOMBRES_ACTIVIDAD.INTENSO} ×${conComa(FACTORES_ACTIVIDAD.INTENSO)} · ${DIAS_POR_NIVEL.INTENSO}`,
 };
 
 /** Qué significa cada nivel, con unidades medibles (pasos / sesiones / minutos). */
@@ -104,6 +112,8 @@ export interface MetabolicResult {
   targetProteinaG: number;
   targetGrasaG: number;
   targetCarbohidratosG: number;
+  /** Agua diaria recomendada en litros (SIN contar las horas de entrenamiento). */
+  aguaLitros: number;
   avisos: string[];
 }
 
@@ -114,6 +124,25 @@ export function factorPorDias(dias: number): number {
   if (d <= 3) return 1.375;
   if (d <= 5) return 1.55;
   return 1.725;
+}
+
+/** Agua extra por cada hora de entrenamiento (500 ml), igual que el Excel. */
+export const AGUA_ML_POR_HORA_ACTIVIDAD = 500;
+
+/**
+ * Agua diaria en litros, con la fórmula del Excel (Objetivos!X26 y X27):
+ *  - IMC < 30: 35 ml × kg de peso real.
+ *  - IMC ≥ 30: (peso ideal × 30 ml) + [(peso real − peso ideal) × 10 ml].
+ * Redondea a 1 decimal, como el Excel. NO incluye las horas de entrenamiento.
+ */
+export function aguaDiariaLitros(peso: number, imc: number, pesoIdeal: number): number {
+  const p = Number.isFinite(peso) && peso > 0 ? peso : 0;
+  if (p === 0) return 0;
+  const litros =
+    imc >= 30 && pesoIdeal > 0
+      ? (pesoIdeal * 30 + (p - pesoIdeal) * 10) / 1000
+      : 0.035 * p;
+  return Math.round(litros * 10) / 10;
 }
 
 /** Clasificación clínica del IMC, sin huecos en los bordes. */
@@ -149,6 +178,14 @@ export function calculateMetabolicTargets(u: UserProfile): MetabolicResult {
   const pesoAjustado = parseFloat(
     (pesoIdeal + 0.25 * (u.peso - pesoIdeal)).toFixed(2),
   );
+
+  // Agua: fórmula del Excel. Con IMC ≥ 30 usa el peso ideal, no 35 ml/kg.
+  const aguaLitros = aguaDiariaLitros(u.peso, imc, pesoIdeal);
+  if (imc >= 30 && pesoIdeal > 0) {
+    avisos.push(
+      `Agua calculada con la fórmula de sobrepeso (peso ideal ${pesoIdeal} kg), no 35 ml/kg.`,
+    );
+  }
 
   // % de grasa válido -> masa libre de grasa.
   const grasaValida =
@@ -287,6 +324,7 @@ export function calculateMetabolicTargets(u: UserProfile): MetabolicResult {
     targetProteinaG,
     targetGrasaG,
     targetCarbohidratosG,
+    aguaLitros,
     avisos,
   };
 }
