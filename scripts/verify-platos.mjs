@@ -181,13 +181,28 @@ checkCerca('factor 2 duplica gramos', doble.gramos, 920, 1);
 
 // ---- Porcion segun presupuesto ----
 check('factor ajusta al presupuesto', factorParaPresupuesto(494, 420), 0.85);
-check('factor tiene techo 1.5', factorParaPresupuesto(500, 1000), 1.5);
+check('factor NO infla aunque sobre presupuesto', factorParaPresupuesto(500, 1000), 1);
+check('factor con 1037 restantes y plato de 611 -> 1', factorParaPresupuesto(611.4, 1037), 1);
+check('factor 1.5 solo si se pide explicito', factorParaPresupuesto(500, 1000, 0.5, 1.5), 1.5);
 check('factor tiene piso 0.5', factorParaPresupuesto(500, 100), 0.5);
 check('factor sin presupuesto -> piso', factorParaPresupuesto(500, 0), 0.5);
 check('factor con plato 0 -> 1', factorParaPresupuesto(0, 500), 1);
 check('factor con NaN -> 1', factorParaPresupuesto(Number.NaN, 500), 1);
 check('texto de 1 porcion', textoPorcion(1), '1 porcion');
 check('texto de 0,85', textoPorcion(0.85), '0,85 porciones');
+
+// ---- Caldo con grasa vs desgrasado (opcion por sopa) ----
+const caldoGallina = platos.find((p) => p.id === 'caldo-de-gallina');
+check('el caldo es una OPCION, no un ingrediente fijo', (caldoGallina.ingredientes ?? []).some((i) => i.nombre.startsWith('Caldo')), false);
+check('la opcion de caldo tiene grasa y desgrasado',
+  (caldoGallina.opciones ?? []).find((o) => o.id === 'caldo')?.alternativas.map((a) => a.id),
+  ['grasa', 'desgrasado']);
+check('por defecto el caldo va con grasa',
+  Math.round(calcularPlato(caldoGallina, { opciones: { caldo: 'grasa' } }, foods, 1).totales.kcal), 611);
+const kcalDesgrasado = Math.round(calcularPlato(caldoGallina, { opciones: { caldo: 'desgrasado' } }, foods, 1).totales.kcal);
+check('el desgrasado resta entre 130 y 150 kcal', kcalDesgrasado >= 461 && kcalDesgrasado <= 481, true);
+check('las 15 sopas tienen la opcion de caldo',
+  platos.filter((p) => p.grupo === 'Sopas').filter((p) => (p.opciones ?? []).some((o) => o.id === 'caldo')).length, 15);
 
 // ---- Regla de la casa: 1 sopa + 1 segundo por comida ----
 check('rol: una sopa es sopa', rolDePlato({ grupo: 'Sopas' }), 'sopa');

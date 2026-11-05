@@ -251,6 +251,14 @@ fuente de verdad.
 - **UI (2 puertas)**: tarjeta **"🍲 Recetario criollo"** arriba de las comidas (contador + buscador, toma
   la comida segun la hora con `comidaPorHora`) y el toggle **`Alimento | Plato criollo`** en cada comida.
   El modal deja **cambiar la comida** sin cerrar.
+- **Porcion: NUNCA se infla sola (05/11/2026).** `factorParaPresupuesto(kcalPlato, kcalRestantes)`
+  tiene **techo 1**: si te sobran calorias NO te sirve "sopa y media" (antes multiplicaba por 1,5 y un
+  caldo de gallina de **611** se mostraba como **917**). El modal deja elegir **0,5 / 0,75 / 1 / 1,25 / 1,5**
+  a mano (boton `auto` para volver al sugerido) y muestra siempre **"1 porcion = X kcal"**.
+- **Caldo con grasa / desgrasado (opcion por sopa).** Las **15 sopas** llevan el caldo como
+  `opciones.caldo` (porDefecto **grasa**), no como ingrediente fijo: *Con grasa* = los gramos de la receta
+  (200 g = 178 kcal); *Desgrasado* = **45 g del MISMO caldo** (~40 kcal) porque la tabla no tiene una fila
+  desgrasada y **no se invento un valor**. Efecto medido: caldo de gallina **611 -> 474** (-137).
 - **Persistencia**: el plato se agrega como **UNA fila** con `foodId: -1`; como su nombre no existe en
   `foods.json`, `normalizarEntradas` la deja intacta -> sobrevive al refresh y a la nube.
 - **Variantes**: `opciones` (seco papa/frejol · carapulcra cerdo/pollo · chupe bonito/merluza ·

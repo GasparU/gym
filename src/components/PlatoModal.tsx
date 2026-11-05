@@ -33,6 +33,7 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
   onAgregar,
 }) => {
   const [extras, setExtras] = useState<string[]>([]);
+  const [factorManual, setFactorManual] = useState<number | null>(null);
   const [comida, setComida] = useState<MealType>(mealTypeInicial);
   const [opciones, setOpciones] = useState<Record<string, string>>(() => {
     const inicial: Record<string, string> = {};
@@ -51,7 +52,9 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
   const seleccion: SeleccionPlato = { extras, opciones };
 
   const base = useMemo(() => calcularPlato(plato, seleccion, foods, 1), [plato, extras, opciones, foods]);
-  const factor = factorParaPresupuesto(base.totales.kcal, kcalRestantes);
+  // NUNCA se infla sola: el ajuste automatico solo puede BAJAR la porcion. Subir es decision del usuario.
+  const sugerido = factorParaPresupuesto(base.totales.kcal, kcalRestantes);
+  const factor = factorManual ?? sugerido;
   const calc = useMemo(() => calcularPlato(plato, seleccion, foods, factor), [plato, extras, opciones, foods, factor]);
   const rol: RolPlato = plato.grupo === 'Sopas' ? 'sopa' : 'segundo';
   const bloqueado = comidasOcupadas.includes(comida);
@@ -225,15 +228,50 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
               </span>
               <span className="text-lg font-bold text-emerald-300">{numEs(calc.totales.kcal)} kcal</span>
             </div>
-            <p className="mt-1 text-[10px] text-slate-400">
-              P {numEsMax(calc.totales.proteinas, 1)} g · G {numEsMax(calc.totales.grasa, 1)} g · C{' '}
-              {numEsMax(calc.totales.carbohidratos, 1)} g · fibra {numEsMax(calc.totales.fibra, 1)} g
-            </p>
-            {Math.abs(factor - 1) > 0.005 && (
-              <p className="mt-1 text-[10px] text-sky-300/90">
-                Porcion ajustada a lo que te queda hoy ({numEs(Math.max(0, kcalRestantes))} kcal).
-              </p>
-            )}
+                <p className="mt-1 text-[10px] text-slate-400">
+                  P {numEsMax(calc.totales.proteinas, 1)} g · G {numEsMax(calc.totales.grasa, 1)} g · C{' '}
+                  {numEsMax(calc.totales.carbohidratos, 1)} g · fibra {numEsMax(calc.totales.fibra, 1)} g
+                </p>
+                <div className="mt-2 flex flex-wrap items-center gap-1">
+                  <span className="text-[10px] text-slate-400">Porcion:</span>
+                  {[0.5, 0.75, 1, 1.25, 1.5].map((f) => {
+                    const activo = Math.abs(factor - f) < 0.005;
+                    return (
+                      <button
+                        key={f}
+                        type="button"
+                        onClick={() => setFactorManual(f)}
+                        aria-pressed={activo}
+                        className={`rounded px-1.5 py-0.5 text-[10px] font-semibold transition-colors ${
+                          activo
+                            ? 'bg-brand-500 text-white'
+                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                        }`}
+                      >
+                        {String(f).replace('.', ',')}
+                      </button>
+                    );
+                  })}
+                  {factorManual !== null && (
+                    <button
+                      type="button"
+                      onClick={() => setFactorManual(null)}
+                      className="text-[10px] text-sky-300 underline"
+                    >
+                      auto
+                    </button>
+                  )}
+                  <span className="ml-1 text-[10px] text-slate-500">
+                    1 porcion = {numEs(base.totales.kcal)} kcal
+                  </span>
+                </div>
+                {Math.abs(factor - 1) > 0.005 && (
+                  <p className="mt-1 text-[10px] text-sky-300/90">
+                    {factorManual === null
+                      ? `Porcion sugerida para lo que te queda hoy (${numEs(Math.max(0, kcalRestantes))} kcal).`
+                      : `Porcion elegida por vos. La base (1 porcion) son ${numEs(base.totales.kcal)} kcal.`}
+                  </p>
+                )}
           </div>
         </div>
 

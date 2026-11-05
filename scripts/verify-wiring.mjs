@@ -74,6 +74,10 @@ check('dieta: doble candado al agregar', dietaPlatos.includes('puedeAgregarPlato
 check('dieta: marca la fila como SOPA o 2do', dietaPlatos.includes('"SOPA" : "2º"'));
 check('modal: deshabilita la comida ocupada', leer('src/components/PlatoModal.tsx').includes('disabled={ocupada}'));
 check('modal: explica por que no se puede', leer('src/components/PlatoModal.tsx').includes('MENSAJE_YA_HAY'));
+check('modal: porciones 0,5 a 1,5 a mano', leer('src/components/PlatoModal.tsx').includes('[0.5, 0.75, 1, 1.25, 1.5]'));
+check('modal: muestra la base de 1 porcion', leer('src/components/PlatoModal.tsx').includes('1 porcion = '));
+check('modal: el ajuste automatico puede volver', leer('src/components/PlatoModal.tsx').includes('setFactorManual(null)'));
+check('modal: usa el factor sugerido', leer('src/components/PlatoModal.tsx').includes('factorManual ?? sugerido'));
 check('dieta: la fila del plato no tiene foodId', dietaPlatos.includes('foodId: -1'));
 check('dieta: toggle Plato criollo', dietaPlatos.includes('"Plato criollo"'));
 check('dieta: pasa las kcal restantes al modal', dietaPlatos.includes('kcalRestantes={targets.metaCalorica - totalAudit.energiaTablaKcal}'));

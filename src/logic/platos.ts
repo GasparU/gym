@@ -168,10 +168,12 @@ export function calcularPlato(
 
 /**
  * Porcion que entra en el presupuesto restante.
- * - Nunca menos de 0,5 ni mas de 1,5 (no sugerimos medio plato ni tres platos).
+ * - Nunca menos de 0,5 (no sugerimos medio plato).
+ * - NUNCA mas de 1: si te sobran calorias, el plato NO se infla solo.
+ *   Subir a 1,25 / 1,5 es decision del usuario (botones del modal).
  * - Sin presupuesto (0 o negativo) -> el minimo.
  */
-export function factorParaPresupuesto(kcalPlato: number, kcalRestantes: number, min = 0.5, max = 1.5): number {
+export function factorParaPresupuesto(kcalPlato: number, kcalRestantes: number, min = 0.5, max = 1): number {
   if (!Number.isFinite(kcalPlato) || kcalPlato <= 0) return 1;
   if (!Number.isFinite(kcalRestantes)) return 1;
   if (kcalRestantes <= 0) return min;

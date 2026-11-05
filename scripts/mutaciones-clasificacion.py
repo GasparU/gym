@@ -58,6 +58,12 @@ MUTS = [
          "if (!puedeAgregarPlato(rolDePlato(plato), rolesEnComida(meals[mealType], platos))) return;", "// sin candado"),
         ("M18 el modal ignora la comida ocupada", "src/components/PlatoModal.tsx",
          "disabled={ocupada}", "disabled={false}"),
+        ("M19 el ajuste vuelve a inflar a 1.5", "src/logic/platos.ts",
+         "min = 0.5, max = 1): number {", "min = 0.5, max = 1.5): number {"),
+        ("M20 desaparece el caldo desgrasado", "public/data/platos.json",
+         '"id": "desgrasado"', '"id": "desgrasadoX"'),
+        ("M21 el modal pierde los botones de porcion", "src/components/PlatoModal.tsx",
+         "[0.5, 0.75, 1, 1.25, 1.5]", "[1]"),
 ]
 
 
@@ -66,6 +72,9 @@ def correr():
             for c in GATES]
 
 
+    # Los scripts que reescriben platos.json lo expanden a 4 lineas por ingrediente:
+# eso rompe las anclas. Se recompacta SIEMPRE antes de medir.
+subprocess.run([sys.executable, "scripts/compactar-platos.py"], check=True)
 base = correr()
 if any(r.returncode != 0 for r in base):
     print("ABORTO: la linea base no esta verde")

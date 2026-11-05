@@ -307,7 +307,6 @@
         { "nombre": "Cebolla de cabeza", "gramos": 30 },
         { "nombre": "Ajo sin cáscara", "gramos": 5 },
         { "nombre": "Aceite vegetal de soya", "gramos": 5 },
-        { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 },
         { "nombre": "Pimienta negra", "gramos": 1 }
       ],
       "extras": [
@@ -325,6 +324,29 @@
           "detalle": "La tabla no tiene sal. No aporta calorias: usa la que necesites.",
           "aproxKcal": 0
         }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de pollo, o gallina*", "gramos": 45 }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -340,14 +362,36 @@
         { "nombre": "Apio, tallo sin hojas", "gramos": 20 },
         { "nombre": "Cebolla de cabeza", "gramos": 25 },
         { "nombre": "Ajo sin cáscara", "gramos": 5 },
-        { "nombre": "Aceite vegetal de soya", "gramos": 3 },
-        { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 }
+        { "nombre": "Aceite vegetal de soya", "gramos": 3 }
       ],
       "observaciones": [
         {
           "ingrediente": "Kion (jengibre)",
           "detalle": "No esta en la tabla. Una rodaja aporta ~2 kcal.",
           "aproxKcal": 2
+        }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de pollo, o gallina*", "gramos": 45 }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -364,7 +408,6 @@
         { "nombre": "Cebolla de cabeza", "gramos": 30 },
         { "nombre": "Ajo sin cáscara", "gramos": 5 },
         { "nombre": "Aceite vegetal de soya", "gramos": 5 },
-        { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 },
         { "nombre": "Pimienta negra", "gramos": 1 }
       ],
       "extras": [
@@ -373,6 +416,29 @@
           "etiqueta": "+ huevo",
           "ingredientes": [
             { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }
+          ]
+        }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de pollo, o gallina*", "gramos": 45 }
+              ]
+            }
           ]
         }
       ]
@@ -390,8 +456,30 @@
         { "nombre": "Ajo sin cáscara", "gramos": 5 },
         { "nombre": "Apio, tallo sin hojas", "gramos": 20 },
         { "nombre": "Aceite vegetal de soya", "gramos": 5 },
-        { "nombre": "Caldo de res*", "gramos": 200 },
         { "nombre": "Pimienta negra", "gramos": 1 }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 45 }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -410,8 +498,30 @@
         { "nombre": "Ajo sin cáscara", "gramos": 5 },
         { "nombre": "Albahaca sin tallo", "gramos": 5 },
         { "nombre": "Zapallo criollo", "gramos": 40 },
-        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
-        { "nombre": "Caldo de res*", "gramos": 200 }
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 45 }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -427,14 +537,36 @@
         { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 },
         { "nombre": "Poro sin hojas", "gramos": 15 },
         { "nombre": "Orégano fresco", "gramos": 2 },
-        { "nombre": "Pimienta negra", "gramos": 1 },
-        { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 }
+        { "nombre": "Pimienta negra", "gramos": 1 }
       ],
       "observaciones": [
         {
           "ingrediente": "Kion (jengibre)",
           "detalle": "No esta en la tabla. Una rodaja aporta ~2 kcal.",
           "aproxKcal": 2
+        }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de pollo, o gallina*", "gramos": 45 }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -452,8 +584,30 @@
         { "nombre": "Cebolla de cabeza", "gramos": 30 },
         { "nombre": "Ajo sin cáscara", "gramos": 5 },
         { "nombre": "Orégano fresco", "gramos": 2 },
-        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
-        { "nombre": "Caldo de res*", "gramos": 200 }
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 45 }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -469,8 +623,30 @@
         { "nombre": "Cebolla de cabeza", "gramos": 25 },
         { "nombre": "Apio, tallo sin hojas", "gramos": 20 },
         { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 },
-        { "nombre": "Pimienta negra", "gramos": 1 },
-        { "nombre": "Caldo de res*", "gramos": 200 }
+        { "nombre": "Pimienta negra", "gramos": 1 }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 45 }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -486,8 +662,30 @@
         { "nombre": "Ajo sin cáscara", "gramos": 5 },
         { "nombre": "Leche evaporada entera", "gramos": 40 },
         { "nombre": "Queso fresco de vaca", "gramos": 20 },
-        { "nombre": "Aceite vegetal de soya", "gramos": 3 },
-        { "nombre": "Caldo de res*", "gramos": 200 }
+        { "nombre": "Aceite vegetal de soya", "gramos": 3 }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 45 }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -503,8 +701,30 @@
         { "nombre": "Cebolla de cabeza", "gramos": 25 },
         { "nombre": "Ajo sin cáscara", "gramos": 5 },
         { "nombre": "Poro sin hojas", "gramos": 15 },
-        { "nombre": "Pimienta negra", "gramos": 1 },
-        { "nombre": "Caldo de res*", "gramos": 200 }
+        { "nombre": "Pimienta negra", "gramos": 1 }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 45 }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -520,8 +740,30 @@
         { "nombre": "Zapallo criollo", "gramos": 50 },
         { "nombre": "Fideo tallarín crudo fortificado con hierro", "gramos": 30 },
         { "nombre": "Cebolla de cabeza", "gramos": 25 },
-        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
-        { "nombre": "Caldo de res*", "gramos": 200 }
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 45 }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -538,14 +780,36 @@
         { "nombre": "Cebolla de cabeza", "gramos": 25 },
         { "nombre": "Ajo sin cáscara", "gramos": 5 },
         { "nombre": "Tomate redondo, con cáscara", "gramos": 30 },
-        { "nombre": "Orégano fresco", "gramos": 2 },
-        { "nombre": "Caldo de res*", "gramos": 200 }
+        { "nombre": "Orégano fresco", "gramos": 2 }
       ],
       "observaciones": [
         {
           "ingrediente": "Pan molido",
           "detalle": "No esta en la tabla. Si lo usas, 10 g de pan son ~28 kcal (busca 'Pan campesino de Lima').",
           "aproxKcal": 28
+        }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 45 }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -562,10 +826,30 @@
         { "nombre": "Tomate redondo, con cáscara", "gramos": 50 },
         { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 15 },
         { "nombre": "Aceite vegetal de soya", "gramos": 5 },
-        { "nombre": "Orégano fresco", "gramos": 2 },
-        { "nombre": "Caldo de res*", "gramos": 150 }
+        { "nombre": "Orégano fresco", "gramos": 2 }
       ],
       "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 150 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -103 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 34 }
+              ]
+            }
+          ]
+        },
         {
           "id": "pescado",
           "etiqueta": "Pescado",
@@ -601,8 +885,30 @@
         { "nombre": "Cebolla de cabeza", "gramos": 30 },
         { "nombre": "Ajo sin cáscara", "gramos": 5 },
         { "nombre": "Aceite vegetal de soya", "gramos": 5 },
-        { "nombre": "Queso fresco de vaca", "gramos": 15 },
-        { "nombre": "Caldo de res*", "gramos": 150 }
+        { "nombre": "Queso fresco de vaca", "gramos": 15 }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 150 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -103 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 34 }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -617,8 +923,30 @@
         { "nombre": "Ajo sin cáscara", "gramos": 5 },
         { "nombre": "Aceite vegetal de soya", "gramos": 5 },
         { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 },
-        { "nombre": "Leche evaporada entera", "gramos": 40 },
-        { "nombre": "Caldo de res*", "gramos": 200 }
+        { "nombre": "Leche evaporada entera", "gramos": 40 }
+      ],
+      "opciones": [
+        {
+          "id": "caldo",
+          "etiqueta": "Caldo",
+          "porDefecto": "grasa",
+          "alternativas": [
+            {
+              "id": "grasa",
+              "etiqueta": "Con grasa (el de la tabla)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "desgrasado",
+              "etiqueta": "Desgrasado (aprox. -138 kcal)",
+              "ingredientes": [
+                { "nombre": "Caldo de res*", "gramos": 45 }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
