@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["backups", "dist", "node_modules", ".astro"]
+}

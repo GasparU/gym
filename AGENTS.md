@@ -234,3 +234,27 @@ fuente de verdad.
 - **Ingredientes fuera de la tabla** (medido: **sillao 0, mayonesa 0, vinagre 0, harina de trigo 0**):
   la receta lleva una **observacion visible** ("no esta en la tabla: pesalo aparte, 1 cda de mayonesa
   ~90 kcal") y ese ingrediente **NO** entra al total calculado. **Regla: nunca inventar el valor.**
+
+## Recetario de platos (Bloque 1: 8 platos) — 05/11/2026
+
+- **Modelo**: `public/data/platos.json` = recetas con **gramos POR PORCION**. Los valores NO se guardan:
+  se calculan desde `foods.json` por **NOMBRE exacto** (`src/logic/platos.ts`, nucleo PURO).
+- **UI**: cada comida tiene el toggle **Alimento | Plato criollo**. El plato abre `PlatoModal`
+  (ingredientes, gramos, kcal, opciones, extras y observaciones), sugiere la porcion con
+  `factorParaPresupuesto` (**piso 0,5 / techo 1,5**) y al agregar crea **UNA fila** con `foodId: -1`.
+  Como el nombre del plato no existe en `foods.json`, `normalizarEntradas` la deja intacta: **la fila
+  sobrevive al refresh y a la nube**.
+- **Variantes**: `opciones` (sustitucion: seco **con papa | con frejol**; carapulcra **con cerdo | con
+  pollo**) y `extras` (**+ huevo, + arroz, + hot dog**).
+- **Ingredientes que NO estan en la tabla** van en `observaciones` con su `aproxKcal` (hoy: **sillao
+  5 kcal** en el chaufa). **Nunca entran al total**: el modal avisa "pesalo aparte".
+- **Valores dorados congelados** en `scripts/verify-platos.mjs` (**60 aserciones**), medidos contra la
+  tabla: arroz con pollo **536,5** · aji de gallina **625,2** · chaufa **598,5** · seco con papa **526,3**
+  (con frejol **706,3**) · pollo al mani **594,6** · carapulcra con cerdo **563,1** (con pollo **534,3**) ·
+  chanfainita **466,7** · ocopa **480,5**.
+- **Gates**: `npm run verify` (metabolismo + alimentos + platos + cableado + dieta) y
+  `npm run verify:types` (`tsc -p tsconfig.check.json`, excluye `backups/`).
+  Mutaciones `scripts/mutaciones-clasificacion.py`: **13/13 ROJAS** (gramos, observacion, factor,
+  cableado del modal).
+- **Pendiente declarado**: **52 platos mas** (60 en total), misma estructura. Los ingredientes sin dato
+  (mayonesa, vinagre, harina de trigo) se declaran como observacion, igual que el sillao.

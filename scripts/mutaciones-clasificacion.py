@@ -10,7 +10,8 @@ import sys
 
 GATES = [["node", "scripts/verify-metabolism.mjs"],
          ["node", "scripts/verify-alimentos.mjs"],
-         ["node", "scripts/verify-wiring.mjs"]]
+         ["node", "scripts/verify-wiring.mjs"],
+         ["node", "scripts/verify-platos.mjs"]]
 
 MUTS = [
     ("M1 el agua ignora el peso real", "src/logic/metabolism.ts",
@@ -36,6 +37,17 @@ MUTS = [
      "coincide;"),
     ("M7 el panel no muestra el agua", "src/components/DietModule.tsx",
      "{numEsMax(targets.aguaLitros, 1)}", "{numEsMax(0, 1)}"),
+    ("M10 cambia los gramos de una receta", "public/data/platos.json",
+     '{ "nombre": "Arroz pilado o pulido cocido", "gramos": 200 }',
+     '{ "nombre": "Arroz pilado o pulido cocido", "gramos": 300 }'),
+        ("M11 desaparece la observacion del sillao", "public/data/platos.json",
+         '"ingrediente": "Sillao (salsa de soya)"',
+         '"ingrediente": "Sin dato"'),
+    ("M12 la porcion ignora el presupuesto", "src/logic/platos.ts",
+     "  const acotado = Math.min(max, Math.max(min, crudo));",
+     "  const acotado = 1;"),
+        ("M13 el modal no agrega el plato", "src/components/DietModule.tsx",
+         "addPlatoToMeal(platoAbierto.mealType, plato, calc);", "void 0;"),
 ]
 
 

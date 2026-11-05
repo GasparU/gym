@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "actualizado": "2026-11-05",
+  "nota": "Gramos POR PORCION (1 plato servido). Los valores nutricionales NO se guardan aca: se calculan desde foods.json por NOMBRE exacto.",
+  "platos": [
+    {
+      "id": "arroz-con-pollo",
+      "nombre": "Arroz con pollo",
+      "grupo": "Arroces y fideos",
+      "nota": "Porcion de 1 plato (~430 g). Receta casera base.",
+      "ingredientes": [
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 200 },
+        { "nombre": "Pollo, carne pulpa", "gramos": 120 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Culantro sin tallo", "gramos": 15 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 20 },
+        { "nombre": "Zanahoria", "gramos": 30 },
+        { "nombre": "Arveja verde partida sancochada", "gramos": 30 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 }
+      ],
+      "extras": [
+        { "id": "huevo", "etiqueta": "+ Huevo duro", "ingredientes": [{ "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }] },
+        { "id": "papa", "etiqueta": "+ Papa sancochada", "ingredientes": [{ "nombre": "Papa blanca", "gramos": 100 }] }
+      ],
+      "opciones": [],
+      "observaciones": []
+    },
+    {
+      "id": "aji-de-gallina",
+      "nombre": "Ají de gallina",
+      "grupo": "Guisos y segundos",
+      "nota": "Porcion de 1 plato (~400 g), con papa y sin arroz.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 130 },
+        { "nombre": "Papa blanca", "gramos": 200 },
+        { "nombre": "Leche evaporada entera", "gramos": 40 },
+        { "nombre": "Galleta de soda (salada)", "gramos": 15 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 30 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 8 },
+        { "nombre": "Pecana", "gramos": 8 },
+        { "nombre": "Queso fresco de vaca", "gramos": 10 }
+      ],
+      "extras": [
+        { "id": "huevo", "etiqueta": "+ Huevo duro", "ingredientes": [{ "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }] },
+        { "id": "arroz", "etiqueta": "+ Arroz blanco", "ingredientes": [{ "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }] }
+      ],
+      "opciones": [],
+      "observaciones": []
+    },
+    {
+      "id": "arroz-chaufa",
+      "nombre": "Arroz chaufa",
+      "grupo": "Arroces y fideos",
+      "nota": "Porcion de 1 plato (~400 g), sin sillao (no esta en la tabla).",
+      "ingredientes": [
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 250 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 },
+        { "nombre": "Pollo, carne pulpa", "gramos": 100 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 12 },
+        { "nombre": "Cebolla de cabeza", "gramos": 20 },
+        { "nombre": "Pimiento rojo", "gramos": 20 }
+      ],
+      "extras": [
+        { "id": "hotdog", "etiqueta": "+ Hot dog", "ingredientes": [{ "nombre": "Hot Dog", "gramos": 50 }] },
+        { "id": "chancho", "etiqueta": "+ Chancho", "ingredientes": [{ "nombre": "Cerdo, carne magra, cruda*", "gramos": 60 }] }
+      ],
+      "opciones": [],
+      "observaciones": [
+        { "ingrediente": "Sillao (salsa de soya)", "detalle": "No esta en la tabla peruana. Pesa lo que le pusiste y sumalo aparte.", "aproxKcal": 5 }
+      ]
+    },
+    {
+      "id": "seco-de-pollo",
+      "nombre": "Seco de pollo",
+      "grupo": "Guisos y segundos",
+      "nota": "Porcion de 1 plato (~450 g). La guarnicion se elige abajo.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 160 },
+        { "nombre": "Cebolla de cabeza", "gramos": 40 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 25 },
+        { "nombre": "Culantro sin tallo", "gramos": 25 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Arveja verde partida sancochada", "gramos": 30 }
+      ],
+      "extras": [
+        { "id": "arroz", "etiqueta": "+ Arroz blanco", "ingredientes": [{ "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }] }
+      ],
+      "opciones": [
+        {
+          "id": "guarnicion",
+          "etiqueta": "Guarnicion",
+          "porDefecto": "papa",
+          "alternativas": [
+            { "id": "papa", "etiqueta": "Con papa", "ingredientes": [{ "nombre": "Papa blanca", "gramos": 200 }] },
+            { "id": "frejol", "etiqueta": "Con frejol", "ingredientes": [{ "nombre": "Frejol canario", "gramos": 150 }] }
+          ]
+        }
+      ],
+      "observaciones": []
+    },
+    {
+      "id": "pollo-al-mani",
+      "nombre": "Pollo al maní",
+      "grupo": "Guisos y segundos",
+      "nota": "Porcion de 1 plato (~400 g), con papa.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 150 },
+        { "nombre": "Maní crudo, pelado con película", "gramos": 25 },
+        { "nombre": "Papa blanca", "gramos": 180 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 20 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 8 },
+        { "nombre": "Leche evaporada entera", "gramos": 20 }
+      ],
+      "extras": [
+        { "id": "arroz", "etiqueta": "+ Arroz blanco", "ingredientes": [{ "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }] }
+      ],
+      "opciones": [],
+      "observaciones": []
+    },
+    {
+      "id": "carapulcra",
+      "nombre": "Carapulcra",
+      "grupo": "Guisos y segundos",
+      "nota": "Porcion de 1 plato (~380 g). Papa seca: 60 g secos rinden ~150 g hidratados.",
+      "ingredientes": [
+        { "nombre": "Papa seca", "gramos": 60 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ají panca", "gramos": 15 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Maní crudo, pelado con película", "gramos": 10 },
+        { "nombre": "Cominos", "gramos": 2 }
+      ],
+      "extras": [
+        { "id": "arroz", "etiqueta": "+ Arroz blanco", "ingredientes": [{ "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }] }
+      ],
+      "opciones": [
+        {
+          "id": "carne",
+          "etiqueta": "Carne",
+          "porDefecto": "cerdo",
+          "alternativas": [
+            { "id": "cerdo", "etiqueta": "Con cerdo", "ingredientes": [{ "nombre": "Cerdo, carne magra, cruda*", "gramos": 120 }] },
+            { "id": "pollo", "etiqueta": "Con pollo", "ingredientes": [{ "nombre": "Pollo, carne pulpa", "gramos": 120 }] }
+          ]
+        }
+      ],
+      "observaciones": []
+    },
+    {
+      "id": "chanfainita",
+      "nombre": "Chanfainita",
+      "grupo": "Guisos y segundos",
+      "nota": "Porcion de 1 plato (~400 g), con bofe de res y papa.",
+      "ingredientes": [
+        { "nombre": "Res, pulmón de (bofe)", "gramos": 150 },
+        { "nombre": "Papa blanca", "gramos": 250 },
+        { "nombre": "Ají panca", "gramos": 15 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 8 },
+        { "nombre": "Cominos", "gramos": 2 }
+      ],
+      "extras": [
+        { "id": "arroz", "etiqueta": "+ Arroz blanco", "ingredientes": [{ "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }] }
+      ],
+      "opciones": [],
+      "observaciones": []
+    },
+    {
+      "id": "ocopa",
+      "nombre": "Ocopa",
+      "grupo": "Entradas y guarniciones",
+      "nota": "Porcion de 1 plato (~250 g), como entrada.",
+      "ingredientes": [
+        { "nombre": "Papa amarilla sin cáscara", "gramos": 200 },
+        { "nombre": "Maní crudo, pelado con película", "gramos": 20 },
+        { "nombre": "Huacatay sin tallo", "gramos": 5 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 20 },
+        { "nombre": "Leche evaporada entera", "gramos": 30 },
+        { "nombre": "Galleta de soda (salada)", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Queso fresco de vaca", "gramos": 10 }
+      ],
+      "extras": [
+        { "id": "huevo", "etiqueta": "+ Huevo duro", "ingredientes": [{ "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }] },
+        { "id": "aceituna", "etiqueta": "+ Aceituna", "ingredientes": [{ "nombre": "Aceituna de botija", "gramos": 15 }] }
+      ],
+      "opciones": [],
+      "observaciones": []
+    }
+  ]
+}

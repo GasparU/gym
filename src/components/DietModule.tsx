@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import type { FoodItem, MealEntry, MealType } from "../types/nutrition";
 import { AutocompleteFood } from "./AutocompleteFood";
+import { BuscadorPlato } from "./BuscadorPlato";
+import { PlatoModal } from "./PlatoModal";
+import type { Plato, PlatoCalculado } from "../logic/platos";
 import { UserProfileCard } from "./UserProfileCard";
 import { computeMealTotals } from "../logic/auditor";
 import { numEs, numEsMax } from "../logic/formato";
@@ -137,6 +140,13 @@ function cargarPerfil(): UserProfile {
 
 export const DietModule: React.FC = () => {
   const [foods, setFoods] = useState<FoodItem[]>([]);
+  const [platos, setPlatos] = useState<Plato[]>([]);
+  const [modo, setModo] = useState<Record<MealType, "alimento" | "plato">>({
+    desayuno: "alimento",
+    almuerzo: "alimento",
+    cena: "alimento",
+  });
+  const [platoAbierto, setPlatoAbierto] = useState<{ plato: Plato; mealType: MealType } | null>(null);
   const [loading, setLoading] = useState(true);
 
   // 1. Cargar Perfil de localStorage o usar el inicial
@@ -287,6 +297,36 @@ export const DietModule: React.FC = () => {
         setLoading(false);
       });
   }, []);
+
+  // Cargar recetario de public/data/platos.json (gramos por porcion)
+  useEffect(() => {
+    fetch("/data/platos.json")
+      .then((res) => res.json())
+      .then((data: { platos: Plato[] }) => setPlatos(data.platos ?? []))
+      .catch((err) => console.error("Error cargando platos.json:", err));
+  }, []);
+
+  const addPlatoToMeal = (mealType: MealType, plato: Plato, calc: PlatoCalculado) => {
+    const nuevaEntrada: MealEntry = {
+      id: crypto.randomUUID(),
+      foodId: -1, // un plato no es un alimento de la tabla: no tiene foodId
+      nombre: plato.nombre,
+      gramos: calc.gramos,
+      kcal: calc.totales.kcal,
+      proteinas: calc.totales.proteinas,
+      grasa: calc.totales.grasa,
+      carbohidratos: calc.totales.carbohidratos,
+      fibra: calc.totales.fibra,
+    };
+
+    const siguiente: Meals = {
+      ...meals,
+      [mealType]: [...meals[mealType], nuevaEntrada],
+    };
+    cambiosLocales.current = true;
+    setMeals(siguiente);
+    persistir(siguiente, mealType);
+  };
 
   const addFoodToMeal = (mealType: MealType, food: FoodItem) => {
     const defaultGrams = 100;
@@ -581,11 +621,36 @@ export const DietModule: React.FC = () => {
             </span>
           </div>
 
-          <AutocompleteFood
-            foods={foods}
-            onSelectFood={(food) => addFoodToMeal(mealType, food)}
-            placeholder={`Agregar alimento a ${mealType}...`}
-          />
+              <div className="flex gap-1.5">
+                {(["alimento", "plato"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setModo((prev) => ({ ...prev, [mealType]: m }))}
+                    aria-pressed={(modo[mealType] ?? "alimento") === m}
+                    className={`rounded-full border px-3 py-1 text-[11px] font-semibold transition-colors ${
+                      (modo[mealType] ?? "alimento") === m
+                        ? "border-brand-500 bg-brand-500/20 text-brand-300"
+                        : "border-slate-700 text-slate-400 hover:border-slate-500"
+                    }`}
+                  >
+                    {m === "alimento" ? "Alimento" : "Plato criollo"}
+                  </button>
+                ))}
+              </div>
+
+              {(modo[mealType] ?? "alimento") === "alimento" ? (
+                <AutocompleteFood
+                  foods={foods}
+                  onSelectFood={(food) => addFoodToMeal(mealType, food)}
+                  placeholder={`Agregar alimento a ${mealType}...`}
+                />
+              ) : (
+                <BuscadorPlato
+                  platos={platos}
+                  onElegir={(plato) => setPlatoAbierto({ plato, mealType })}
+                />
+              )}
 
           {meals[mealType].length > 0 && (
             <div className="overflow-x-auto">
@@ -663,6 +728,19 @@ export const DietModule: React.FC = () => {
           )}
         </div>
       ))}
+      {platoAbierto && (
+        <PlatoModal
+          plato={platoAbierto.plato}
+          foods={foods}
+          kcalRestantes={targets.metaCalorica - totalAudit.energiaTablaKcal}
+          onCerrar={() => setPlatoAbierto(null)}
+          onAgregar={(plato, calc) => {
+            addPlatoToMeal(platoAbierto.mealType, plato, calc);
+            setPlatoAbierto(null);
+          }}
+        />
+      )}
+
     </div>
   );
 };

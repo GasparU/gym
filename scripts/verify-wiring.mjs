@@ -58,6 +58,28 @@ check('metabolismo: fórmula 35 ml/kg', meta.includes('0.035 * p'));
 check('metabolismo: fórmula con peso ideal', meta.includes('pesoIdeal * 30'));
 check('metabolismo: devuelve aguaLitros', meta.includes('aguaLitros,'));
 
+// ---------- Recetario de platos ----------
+const dietaPlatos = leer('src/components/DietModule.tsx');
+check('dieta: importa el buscador de platos', dietaPlatos.includes('BuscadorPlato'));
+check('dieta: importa el modal de receta', dietaPlatos.includes('PlatoModal'));
+check('dieta: carga platos.json', dietaPlatos.includes('/data/platos.json'));
+check('dieta: agrega el plato a la comida', dietaPlatos.includes('addPlatoToMeal(platoAbierto.mealType'));
+check('dieta: la fila del plato no tiene foodId', dietaPlatos.includes('foodId: -1'));
+check('dieta: toggle Plato criollo', dietaPlatos.includes('"Plato criollo"'));
+check('dieta: pasa las kcal restantes al modal', dietaPlatos.includes('kcalRestantes={targets.metaCalorica - totalAudit.energiaTablaKcal}'));
+
+const modal = leer('src/components/PlatoModal.tsx');
+check('modal: ajusta la porcion al presupuesto', modal.includes('factorParaPresupuesto(base.totales.kcal, kcalRestantes)'));
+check('modal: declara los ingredientes sin dato', modal.includes('Ingrediente sin dato en la tabla'));
+check('modal: lista las observaciones', modal.includes('plato.observaciones'));
+check('modal: cierra con Escape', modal.includes("e.key === 'Escape'"));
+check('modal: usa el texto de porcion', modal.includes('textoPorcion(factor)'));
+
+const buscador = leer('src/components/BuscadorPlato.tsx');
+check('buscador de platos: avisa las recetas caseras', buscador.includes('recetas caseras'));
+check('buscador de platos: ordena alfabetico', buscador.includes("a.nombre.localeCompare(b.nombre, 'es')"));
+check('buscador de platos: no recorta la lista', buscador.includes('.slice(0'), false);
+
 console.log('=== Cableado de la UI: verificación ===');
 if (fallos.length) {
   console.log(`\n❌ ${fallos.length} FALLO(S) de ${ok + fallos.length}:`);
