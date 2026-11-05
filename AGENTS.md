@@ -212,3 +212,25 @@ fuente de verdad.
 - **Pendientes declarados** (estaban en los Excel, NO implementados): **ETA/TEF** (~7,8 %, informativo),
   **antropometria** (12 pliegues/perimetros del `Historial Dietetico`), **contador de agua** y **platos
   peruanos** (propuesta: recetas con ingredientes reales + porcion ajustada al presupuesto restante).
+
+### Buscador con filtros: TODOS los resultados (05/11/2026)
+
+- **BUG corregido**: con un chip activo (`Llena mas` / `+ Proteina` / `+ Fibra`) la lista se cortaba
+  en **10** (`slice(0, 10)`), asi que solo se veian los primeros del catalogo (**la letra "A"**).
+  Ahora: **con texto** -> 10 sugerencias; **solo con filtros** -> **TODOS**, en **orden alfabetico**
+  (`localeCompare(es)`), con contador (`N alimentos`) y el tope de seguridad `MAX_SOLO_FILTROS = 500`.
+  Los chips pasaron **arriba del input** (antes el desplegable los tapaba).
+- **Se muestra "cuanto llena"**: cada fila dice `Llena: Alta | Media | Baja - fibra X g - Y kcal/100 g`.
+  La categoria sola no alcanza para comparar; los numeros reales (fibra + densidad energetica) si.
+- Gate `scripts/verify-wiring.mjs` (**26**) con 6 aserciones nuevas; mutaciones **9/9 ROJAS**
+  (M8 vuelve a cortar en 10, M9 pierde el orden alfabetico).
+
+### Platos peruanos: decision de alcance (05/11/2026)
+
+- **60 platos** (no 40). Cada plato = **receta declarada** (ingredientes + gramos), nunca un numero
+  inventado; el usuario ajusta una vez y queda su **"mi version"**.
+- **Variantes** se modelan como **extras/sustituciones** (`+ hot dog`, `con papa | con frejol`), no como
+  sub-recetas.
+- **Ingredientes fuera de la tabla** (medido: **sillao 0, mayonesa 0, vinagre 0, harina de trigo 0**):
+  la receta lleva una **observacion visible** ("no esta en la tabla: pesalo aparte, 1 cda de mayonesa
+  ~90 kcal") y ese ingrediente **NO** entra al total calculado. **Regla: nunca inventar el valor.**

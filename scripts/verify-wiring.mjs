@@ -26,6 +26,12 @@ check('buscador: chip Llena más', autocomplete.includes('Llena más'));
 check('buscador: chip + Proteína', autocomplete.includes('+ Proteína'));
 check('buscador: chip + Fibra', autocomplete.includes('+ Fibra'));
 check('buscador: pinta el aviso de glucemia alta', autocomplete.includes("item.glucemia === 'Alta'"));
+check('buscador: filtros muestran TODOS (no 10)', autocomplete.includes('MAX_SOLO_FILTROS'));
+check('buscador: ordena alfabetico con filtros', autocomplete.includes("a.nombre.localeCompare(b.nombre, 'es')"));
+check('buscador: no recorta la lista con filtros', autocomplete.includes('ordenados.slice(0, MAX_SOLO_FILTROS)'));
+check('buscador: avisa el orden y el total', autocomplete.includes('orden alfabético'));
+check('buscador: muestra cuanto llena', autocomplete.includes('Llena:'));
+check('buscador: muestra la fibra por 100 g', autocomplete.includes('fibra {numEsMax(item.fibra, 1)} g'));
 
 // ---------- Selector de actividad: días de referencia ----------
 const perfil = leer('src/components/UserProfileCard.tsx');
