@@ -235,38 +235,38 @@ fuente de verdad.
   la receta lleva una **observacion visible** ("no esta en la tabla: pesalo aparte, 1 cda de mayonesa
   ~90 kcal") y ese ingrediente **NO** entra al total calculado. **Regla: nunca inventar el valor.**
 
-## Recetario de platos (23 platos: 8 criollos + 15 sopas) — 05/11/2026
+## Recetario de platos — **60 platos** (8 criollos + 15 sopas + 37 platos) — 05/11/2026
 
-- **Modelo**: `public/data/platos.json` = recetas con **gramos POR PORCION**. Los valores NO se guardan:
-  se calculan desde `foods.json` por **NOMBRE exacto** (`src/logic/platos.ts`, nucleo PURO).
-- **UI (2 puertas, las dos visibles)**:
-  1. **Tarjeta "🍲 Recetario criollo" ARRIBA de las comidas** (siempre a la vista, con el contador de platos).
-     Al elegir un plato toma como inicio la **comida segun la hora** (`comidaPorHora`).
-  2. **Toggle `Alimento | Plato criollo` dentro de cada comida** (botones grandes, ya no grises de 11 px).
-- **`PlatoModal`**: ingredientes con gramos y kcal, opciones, extras, observaciones y un **selector de
-  comida** (`¿A qué comida lo sumás?`): se puede mandar el plato a otra comida sin cerrar.
-  Sugiere la porcion con `factorParaPresupuesto` (**piso 0,5 / techo 1,5**).
-- **Persistencia**: el plato se agrega como **UNA fila** con `foodId: -1`. Como su nombre no existe en
-  `foods.json`, `normalizarEntradas` la deja intacta: **sobrevive al refresh y a la nube**.
-- **Variantes**: `opciones` (seco **con papa | con frejol**; carapulcra **con cerdo | con pollo**; chupe
-  **bonito | merluza**) y `extras` (**+ huevo, + arroz, + hot dog, + chancho, + mas arroz**).
-- **Ingredientes que NO estan en la tabla** van en `observaciones` con su `aproxKcal` (sillao 5 kcal,
-  kion 2 kcal, pan molido 28 kcal, sal 0). **Nunca entran al total**: el modal avisa "pesalo aparte".
-  **Si existen** (verificado, corrige una afirmacion previa): `Trigo, harina fortificada con hierro de`,
-  `Trigo, sémola de`, `Quinua`, `Cebada perlada o resbalada cruda`, `Pescado bonito`, `Pescado merluza,
-  fresco`, `Gallina, pierna de (sin piel)`, `Caldo de res*`, `Caldo de pollo, o gallina*`.
+- **Modelo**: `public/data/platos.json` (60 platos) = recetas con **gramos POR PORCION**. Los valores
+  NO se guardan: se calculan desde `foods.json` por **NOMBRE exacto** (`src/logic/platos.ts`, nucleo PURO).
+  **Grupos**: Arroces y fideos · Guisos y segundos · Menestras · Pollos y carnes · Entradas y
+  guarniciones · Sopas · Pescados.
+- **REGLA DE LA CASA (pedido del dueno): UNA sopa + UN segundo por comida, se SUMAN, no se reemplazan.**
+  Núcleo puro: `rolDePlato` (grupo `Sopas` -> `sopa`; todo lo demas -> `segundo`),
+  `rolesEnComida(entradas, platos)` (resuelve por **NOMBRE** contra el recetario: las filas guardadas
+  no llevan rol, no hace falta migrar) y `puedeAgregarPlato(rol, rolesYaEnComida)` (**nunca 2 del mismo**).
+  `MENSAJE_YA_HAY` explica el porque. **Doble candado**: el `PlatoModal` deshabilita la comida ocupada
+  (`disabled={ocupada}` + tachado + mensaje) **y** `addPlatoToMeal` vuelve a validar antes de escribir.
+  La tabla de cada comida marca la fila con **`SOPA` / `2º`**.
+- **UI (2 puertas)**: tarjeta **"🍲 Recetario criollo"** arriba de las comidas (contador + buscador, toma
+  la comida segun la hora con `comidaPorHora`) y el toggle **`Alimento | Plato criollo`** en cada comida.
+  El modal deja **cambiar la comida** sin cerrar.
+- **Persistencia**: el plato se agrega como **UNA fila** con `foodId: -1`; como su nombre no existe en
+  `foods.json`, `normalizarEntradas` la deja intacta -> sobrevive al refresh y a la nube.
+- **Variantes**: `opciones` (seco papa/frejol · carapulcra cerdo/pollo · chupe bonito/merluza ·
+  chicharron papas/yuca/ensalada · pescado frito bonito/merluza) y `extras` (+huevo, +arroz, +hot dog,
+  +chancho, +mas arroz, +cremas, +aceituna, +mas papa).
+- **Ingredientes que NO estan en la tabla** -> `observaciones` con `aproxKcal` (sillao 5-10, kion 2,
+  pan molido 28, mayonesa 90, vinagre 3, sal 0). **Nunca entran al total.** Verificado que **si existen**:
+  harina de trigo, semola de trigo, quinua, cebada, pescado bonito/merluza, gallina, caldos, yuca,
+  chicharron de cerdo, palta, lechuga, limon, salchicha, chicha de jora, aji panca, galleta de soda.
 - **El caldo de la tabla trae grasa** (89 kcal/100 g): la nota de cada sopa avisa que si se desgrasa
   resta ~150 kcal. **No se descuenta solo.**
-- **Valores dorados congelados** en `scripts/verify-platos.mjs` (**125 aserciones**) — 23 platos base y
-  sus variantes. Sopas: aguadito 647,7 · pollo con fideos 562,3 · sémola 564,8 · lentejas 327,3 ·
-  menestrón 585,2 · caldo de gallina 611,4 · minuta 508,8 · sustancia 458,5 · quinua 444,5 ·
-  morón 370,4 · verduras 384,0 · albóndigas 376,1 · chupe 556,7 (merluza 470,9) · zapallo 341,2 ·
-  arvejas 481,6.
-- **Gates**: `npm run verify` (metabolismo · alimentos · platos · cableado · dieta) y
+- **Valores dorados congelados** en `scripts/verify-platos.mjs` (**287 aserciones**): 60 platos base +
+  variantes + escalado por factor + porcion por presupuesto + la regla sopa/segundo.
+- **Gates**: `npm run verify` (metabolismo 146 · alimentos 34 · platos 287 · cableado 51 · dieta 43) y
   `npm run verify:types` (`tsc -p tsconfig.check.json`, excluye `backups/`).
-  Mutaciones `scripts/mutaciones-clasificacion.py`: **15/15 ROJAS** (gramos, observacion, factor,
-  cableado del modal, titulo del recetario, selector de comida).
-- **Pendiente declarado**: **37 platos mas** (60 en total): carnes/pollos (pollada, brasa, chicharrón de
-  pollo, lomo saltado, anticuchos...), entradas (huancaína, causa, ensalada rusa), arroces y pescados.
-  **No existen en la tabla y hay que declararlos**: mayonesa, vinagre, sillao, kion, mote, ají panca en
-  pasta (si existe en polvo).
+  Mutaciones `scripts/mutaciones-clasificacion.py`: **18/18 ROJAS**. El runner ahora aplica **todas** las
+  apariciones del patron (antes exigia 1 y las anclas fragiles dejaban mutaciones sin aplicar).
+- **Pendiente declarado**: ampliar a mas platos cuando el dueno lo pida; `tamal` y `patasca` **no se
+  pueden** modelar (no hay mote ni maiz molido en la tabla).

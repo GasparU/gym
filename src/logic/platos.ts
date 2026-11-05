@@ -87,6 +87,7 @@ export const GRUPOS_PLATO = [
   'Pollos y carnes',
   'Entradas y guarniciones',
   'Sopas',
+  'Pescados',
 ];
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -186,3 +187,34 @@ export function textoPorcion(factor: number): string {
   const n = (Math.round(f * 100) / 100).toString().replace('.', ',');
   return `${n} porciones`;
 }
+
+export type RolPlato = 'sopa' | 'segundo';
+
+/** Un plato es SOPA si su grupo es Sopas; todo lo demas es SEGUNDO. */
+export function rolDePlato(plato: Pick<Plato, 'grupo'>): RolPlato {
+  return plato.grupo === 'Sopas' ? 'sopa' : 'segundo';
+}
+
+/**
+ * Regla de la casa: en una comida va UNA sopa y UN segundo.
+ * Nunca dos segundos (ni dos sopas): se suman, no se reemplazan.
+ */
+export function puedeAgregarPlato(rol: RolPlato, rolesYaEnComida: RolPlato[]): boolean {
+  return rolesYaEnComida.filter((r) => r === rol).length === 0;
+}
+
+/** Roles de plato ya presentes en una comida, resueltos por NOMBRE contra el recetario. */
+export function rolesEnComida(entradas: { nombre: string }[], platos: Plato[]): RolPlato[] {
+  const porNombre = new Map(platos.map((p) => [p.nombre, rolDePlato(p)]));
+  const out: RolPlato[] = [];
+  for (const e of entradas) {
+    const rol = porNombre.get(e.nombre);
+    if (rol) out.push(rol);
+  }
+  return out;
+}
+
+export const MENSAJE_YA_HAY: Record<RolPlato, string> = {
+  sopa: 'Esta comida ya tiene sopa. Podés añadir el segundo o quitar la sopa.',
+  segundo: 'Esta comida ya tiene segundo. Podés añadir la sopa o quitar el segundo.',
+};

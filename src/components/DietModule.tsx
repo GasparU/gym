@@ -3,6 +3,7 @@ import type { FoodItem, MealEntry, MealType } from "../types/nutrition";
 import { AutocompleteFood } from "./AutocompleteFood";
 import { BuscadorPlato } from "./BuscadorPlato";
 import { PlatoModal } from "./PlatoModal";
+import { puedeAgregarPlato, rolDePlato, rolesEnComida } from "../logic/platos";
 import type { Plato, PlatoCalculado } from "../logic/platos";
 import { UserProfileCard } from "./UserProfileCard";
 import { computeMealTotals } from "../logic/auditor";
@@ -155,7 +156,6 @@ export const DietModule: React.FC = () => {
     cena: "alimento",
   });
   const [platoAbierto, setPlatoAbierto] = useState<{ plato: Plato; mealType: MealType } | null>(null);
-  const [loading, setLoading] = useState(true);
 
   // 1. Cargar Perfil de localStorage o usar el inicial
   const [profile, setProfile] = useState<UserProfile>(cargarPerfil);
@@ -215,6 +215,22 @@ export const DietModule: React.FC = () => {
       : (leerCacheDe(window.localStorage.getItem(claveCache(getTodayDateString()))) ??
         mealsVacio()),
   );
+
+  // Regla de la casa: en una comida va UNA sopa y UN segundo (se suman, no se reemplazan).
+  const rolesPorComida = useMemo(
+    () => ({
+      desayuno: rolesEnComida(meals.desayuno, platos),
+      almuerzo: rolesEnComida(meals.almuerzo, platos),
+      cena: rolesEnComida(meals.cena, platos),
+    }),
+    [meals, platos],
+  );
+
+  const comidasOcupadasPara = (rol: "sopa" | "segundo") =>
+    (["desayuno", "almuerzo", "cena"] as MealType[]).filter((t) =>
+      rolesPorComida[t].includes(rol),
+    );
+  const [loading, setLoading] = useState(true);
   const cambiosLocales = useRef(false);
   const timersNube = useRef<Partial<Record<MealType, ReturnType<typeof setTimeout>>>>({});
   const colasNube = useRef<Partial<Record<MealType, Promise<unknown>>>>({});
@@ -315,6 +331,8 @@ export const DietModule: React.FC = () => {
   }, []);
 
   const addPlatoToMeal = (mealType: MealType, plato: Plato, calc: PlatoCalculado) => {
+    // Doble candado: si esta comida ya tiene uno del mismo rol, no se agrega.
+    if (!puedeAgregarPlato(rolDePlato(plato), rolesEnComida(meals[mealType], platos))) return;
     const nuevaEntrada: MealEntry = {
       id: crypto.randomUUID(),
       foodId: -1, // un plato no es un alimento de la tabla: no tiene foodId
@@ -701,6 +719,16 @@ export const DietModule: React.FC = () => {
 
                               {item.nombre}
 
+                                {(() => {
+                                  const pl = platos.find((x) => x.nombre === item.nombre);
+                                  if (!pl) return null;
+                                  return (
+                                    <span className="ml-1 rounded bg-brand-500/20 px-1 py-0.5 text-[9px] font-bold text-brand-300">
+                                      {pl.grupo === "Sopas" ? "SOPA" : "2º"}
+                                    </span>
+                                  );
+                                })()}
+
                               {(() => {
 
                                 const f = foods.find((x) => x.id === item.foodId);
@@ -760,6 +788,7 @@ export const DietModule: React.FC = () => {
           foods={foods}
           kcalRestantes={targets.metaCalorica - totalAudit.energiaTablaKcal}
           mealTypeInicial={platoAbierto.mealType}
+          comidasOcupadas={comidasOcupadasPara(rolDePlato(platoAbierto.plato))}
           onCerrar={() => setPlatoAbierto(null)}
           onAgregar={(plato, calc, mealType) => {
             addPlatoToMeal(mealType, plato, calc);

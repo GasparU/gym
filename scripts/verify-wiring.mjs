@@ -68,6 +68,12 @@ check('dieta: el recetario esta siempre a la vista', dietaPlatos.includes('Recet
 check('dieta: sugiere la comida segun la hora', dietaPlatos.includes('comidaPorHora'));
 check('dieta: pasa la comida inicial al modal', dietaPlatos.includes('mealTypeInicial={platoAbierto.mealType}'));
 check('dieta: el modal puede cambiar de comida', leer('src/components/PlatoModal.tsx').includes('¿A qué comida lo sumás?'));
+check('dieta: calcula sopa/segundo por comida', dietaPlatos.includes('rolesPorComida'));
+check('dieta: sabe que comidas ya tienen ese rol', dietaPlatos.includes('comidasOcupadasPara'));
+check('dieta: doble candado al agregar', dietaPlatos.includes('puedeAgregarPlato(rolDePlato(plato)'));
+check('dieta: marca la fila como SOPA o 2do', dietaPlatos.includes('"SOPA" : "2º"'));
+check('modal: deshabilita la comida ocupada', leer('src/components/PlatoModal.tsx').includes('disabled={ocupada}'));
+check('modal: explica por que no se puede', leer('src/components/PlatoModal.tsx').includes('MENSAJE_YA_HAY'));
 check('dieta: la fila del plato no tiene foodId', dietaPlatos.includes('foodId: -1'));
 check('dieta: toggle Plato criollo', dietaPlatos.includes('"Plato criollo"'));
 check('dieta: pasa las kcal restantes al modal', dietaPlatos.includes('kcalRestantes={targets.metaCalorica - totalAudit.energiaTablaKcal}'));

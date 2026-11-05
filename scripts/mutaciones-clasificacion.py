@@ -52,6 +52,12 @@ MUTS = [
          "🍲 Recetario criollo", "🍲 Recetas"),
         ("M15 el modal no deja elegir la comida", "src/components/PlatoModal.tsx",
          "¿A qué comida lo sumás?", "Comida"),
+        ("M16 se permite un segundo con segundo", "src/logic/platos.ts",
+         "return rolesYaEnComida.filter((r) => r === rol).length === 0;", "return true;"),
+        ("M17 desaparece el candado al agregar", "src/components/DietModule.tsx",
+         "if (!puedeAgregarPlato(rolDePlato(plato), rolesEnComida(meals[mealType], platos))) return;", "// sin candado"),
+        ("M18 el modal ignora la comida ocupada", "src/components/PlatoModal.tsx",
+         "disabled={ocupada}", "disabled={false}"),
 ]
 
 
@@ -76,12 +82,15 @@ for nombre, archivo, viejo, nuevo in MUTS:
     nl = "\r\n" if "\r\n" in src else "\n"
     viejo = viejo.replace("\n", nl)
     nuevo = nuevo.replace("\n", nl)
-    if src.count(viejo) != 1:
-        print("NO-APLICA %-46s (%d ocurrencias)" % (nombre, src.count(viejo)))
+    n = src.count(viejo)
+    if n == 0:
+        print("NO-APLICA %-46s (0 ocurrencias)" % nombre)
         shutil.copy2(archivo + ".bak", archivo)
         os.remove(archivo + ".bak")
         continue
-    io.open(archivo, "w", encoding="utf-8", newline="").write(src.replace(viejo, nuevo, 1))
+    # Se reemplazan TODAS las apariciones: si el patron esta en 3 recetas, la mutacion
+    # cambia las 3. Exigir una sola obligaba a anclas fragiles que dejaban de aplicar.
+    io.open(archivo, "w", encoding="utf-8", newline="").write(src.replace(viejo, nuevo))
     res = correr()
     shutil.copy2(archivo + ".bak", archivo)
     os.remove(archivo + ".bak")

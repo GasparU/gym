@@ -4,8 +4,10 @@ import {
   calcularPlato,
   factorParaPresupuesto,
   textoPorcion,
+  MENSAJE_YA_HAY,
   type Plato,
   type PlatoCalculado,
+  type RolPlato,
   type SeleccionPlato,
 } from '../logic/platos';
 import { numEs, numEsMax } from '../logic/formato';
@@ -15,6 +17,8 @@ interface PlatoModalProps {
   foods: FoodItem[];
   kcalRestantes: number;
   mealTypeInicial: MealType;
+  /** Comidas donde este rol (sopa / segundo) ya esta ocupado: no se puede repetir. */
+  comidasOcupadas?: MealType[];
   onCerrar: () => void;
   onAgregar: (plato: Plato, calculado: PlatoCalculado, mealType: MealType) => void;
 }
@@ -24,6 +28,7 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
   foods,
   kcalRestantes,
   mealTypeInicial,
+  comidasOcupadas = [],
   onCerrar,
   onAgregar,
 }) => {
@@ -48,6 +53,8 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
   const base = useMemo(() => calcularPlato(plato, seleccion, foods, 1), [plato, extras, opciones, foods]);
   const factor = factorParaPresupuesto(base.totales.kcal, kcalRestantes);
   const calc = useMemo(() => calcularPlato(plato, seleccion, foods, factor), [plato, extras, opciones, foods, factor]);
+  const rol: RolPlato = plato.grupo === 'Sopas' ? 'sopa' : 'segundo';
+  const bloqueado = comidasOcupadas.includes(comida);
 
   const toggleExtra = (id: string) =>
     setExtras((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -86,22 +93,34 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
           <div>
             <p className="mb-1 text-[11px] font-semibold text-slate-300">¿A qué comida lo sumás?</p>
             <div className="flex gap-1.5">
-              {(['desayuno', 'almuerzo', 'cena'] as const).map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => setComida(m)}
-                  aria-pressed={comida === m}
-                  className={`flex-1 rounded-lg border px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${
-                    comida === m
-                      ? 'border-brand-500 bg-brand-500/20 text-brand-300'
-                      : 'border-slate-700 text-slate-400 hover:border-slate-500'
-                  }`}
-                >
-                  {m}
-                </button>
-              ))}
+              {(['desayuno', 'almuerzo', 'cena'] as const).map((m) => {
+                const ocupada = comidasOcupadas.includes(m);
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setComida(m)}
+                    aria-pressed={comida === m}
+                    disabled={ocupada}
+                    title={ocupada ? MENSAJE_YA_HAY[rol] : undefined}
+                    className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-semibold capitalize transition-colors ${
+                      ocupada
+                        ? 'cursor-not-allowed border-slate-800 text-slate-600 line-through'
+                        : comida === m
+                          ? 'border-brand-500 bg-brand-500/20 text-brand-300'
+                          : 'border-slate-700 text-slate-400 hover:border-slate-500'
+                    }`}
+                  >
+                    {m}
+                  </button>
+                );
+              })}
             </div>
+            {bloqueado && (
+              <p role="status" className="mt-1.5 text-[10px] leading-snug text-amber-300">
+                {MENSAJE_YA_HAY[rol]}
+              </p>
+            )}
           </div>
 
           {/* Opciones (sustituciones) */}
@@ -221,10 +240,17 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
         <div className="sticky bottom-0 border-t border-slate-700 bg-slate-900/95 px-4 py-3">
           <button
             type="button"
+            disabled={bloqueado}
             onClick={() => onAgregar(plato, calc, comida)}
-            className="w-full rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
+            className={`w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
+              bloqueado
+                ? 'cursor-not-allowed bg-slate-700 text-slate-400'
+                : 'bg-brand-500 text-white hover:bg-brand-600'
+            }`}
           >
-            Agregar a {comida} · {textoPorcion(factor)} · {numEs(calc.totales.kcal)} kcal
+            {bloqueado
+              ? `${comida} ya tiene ${rol}`
+              : `Agregar a ${comida} · ${textoPorcion(factor)} · ${numEs(calc.totales.kcal)} kcal`}
           </button>
         </div>
       </div>

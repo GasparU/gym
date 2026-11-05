@@ -6,6 +6,9 @@ import {
   factorParaPresupuesto,
   textoPorcion,
   GRUPOS_PLATO,
+  rolDePlato,
+  puedeAgregarPlato,
+  rolesEnComida,
 } from '../src/logic/platos.ts';
 
 const foods = JSON.parse(fs.readFileSync('public/data/foods.json', 'utf8'));
@@ -28,11 +31,11 @@ const platos = data.platos ?? [];
 const porNombre = new Map(foods.map((f) => [f.nombre, f]));
 
 // ---- Estructura ----
-check('cantidad de platos', platos.length, 23);
+check('cantidad de platos', platos.length, 60);
 check('ids unicos', new Set(platos.map((p) => p.id)).size, platos.length);
 check('nombres unicos', new Set(platos.map((p) => p.nombre)).size, platos.length);
 check('todos tienen grupo valido', platos.every((p) => GRUPOS_PLATO.includes(p.grupo)), true);
-check('todos tienen al menos 5 ingredientes', platos.every((p) => p.ingredientes.length >= 5), true);
+check('todos tienen al menos 3 ingredientes', platos.every((p) => p.ingredientes.length >= 3), true);
 check('hay 15 sopas', platos.filter((p) => p.grupo === 'Sopas').length, 15);
 check(
   'gramos positivos',
@@ -82,25 +85,62 @@ const GOLD = {
   'aji-de-gallina': { kcal: 625.2, p: 39.5, g: 471 },
   'arroz-chaufa': { kcal: 598.5, p: 34.3, g: 452 },
   'seco-de-pollo': { kcal: 526.3, p: 43.3, g: 490 },
-  'pollo-al-mani': { kcal: 594.6, p: 44.0, g: 433 },
-  carapulcra: { kcal: 563.1, p: 35.2, g: 252 },
-  chanfainita: { kcal: 466.7, p: 33.3, g: 460 },
-  ocopa: { kcal: 480.5, p: 14.2, g: 300 },
+  'pollo-al-mani': { kcal: 594.6, p: 44, g: 433 },
+  'carapulcra': { kcal: 563.1, p: 35.2, g: 252 },
+  'chanfainita': { kcal: 466.7, p: 33.3, g: 460 },
+  'ocopa': { kcal: 480.5, p: 14.2, g: 300 },
   'aguadito-de-pollo': { kcal: 647.7, p: 34.7, g: 561 },
   'sopa-de-pollo-con-fideos': { kcal: 562.3, p: 32.8, g: 523 },
   'sopa-de-semola-con-pollo': { kcal: 564.8, p: 27.7, g: 491 },
   'sopa-de-lentejas': { kcal: 327.3, p: 16.7, g: 421 },
-  menestron: { kcal: 585.2, p: 36.9, g: 540 },
+  'menestron': { kcal: 585.2, p: 36.9, g: 540 },
   'caldo-de-gallina': { kcal: 611.4, p: 37.7, g: 523 },
   'sopa-a-la-minuta': { kcal: 508.8, p: 34.4, g: 512 },
   'sopa-de-sustancia': { kcal: 458.5, p: 34.5, g: 536 },
   'sopa-de-quinua': { kcal: 444.5, p: 16.8, g: 428 },
   'sopa-de-moron': { kcal: 370.4, p: 24.6, g: 461 },
-  'sopa-de-verduras': { kcal: 384.0, p: 11.5, g: 500 },
+  'sopa-de-verduras': { kcal: 384, p: 11.5, g: 500 },
   'sopa-de-albondigas': { kcal: 376.1, p: 31.4, g: 512 },
   'chupe-de-pescado': { kcal: 556.7, p: 45.8, g: 602 },
   'sopa-de-zapallo': { kcal: 341.2, p: 11.2, g: 515 },
   'sopa-de-arvejas': { kcal: 481.6, p: 25.8, g: 530 },
+  'pollo-a-la-brasa': { kcal: 556.2, p: 58.1, g: 457 },
+  'pollada': { kcal: 545, p: 47.7, g: 406 },
+  'chicharron-de-pollo': { kcal: 730, p: 47.4, g: 411 },
+  'pollo-al-horno-con-papas': { kcal: 521.7, p: 51.5, g: 428 },
+  'milanesa-de-pollo': { kcal: 563.6, p: 41.3, g: 375 },
+  'lomo-saltado': { kcal: 676.9, p: 41.4, g: 630 },
+  'bistec-a-lo-pobre': { kcal: 717.8, p: 46.6, g: 571 },
+  'anticuchos': { kcal: 559.2, p: 34, g: 481 },
+  'chicharron-de-cerdo': { kcal: 1084, p: 21.7, g: 340 },
+  'albondigas-en-salsa': { kcal: 516.7, p: 35.5, g: 445 },
+  'carne-guisada-con-papa': { kcal: 623.2, p: 37.5, g: 605 },
+  'pollo-al-sillao': { kcal: 534.5, p: 48, g: 470 },
+  'papa-a-la-huancaina': { kcal: 571.2, p: 22.2, g: 405 },
+  'causa-limenya': { kcal: 493.1, p: 26, g: 390 },
+  'ensalada-rusa': { kcal: 313.5, p: 12.4, g: 290 },
+  'papa-camote-y-choclo': { kcal: 429.5, p: 14.5, g: 400 },
+  'ensalada-fresca': { kcal: 120.4, p: 1.9, g: 220 },
+  'choclo-con-queso': { kcal: 315, p: 13.6, g: 245 },
+  'papa-rellena': { kcal: 516.1, p: 31.2, g: 390 },
+  'salchipapa': { kcal: 665.8, p: 13.8, g: 295 },
+  'ensalada-de-pallares': { kcal: 221.1, p: 13.2, g: 155 },
+  'tallarin-saltado': { kcal: 557, p: 36, g: 525 },
+  'sopa-seca': { kcal: 503.4, p: 35.3, g: 495 },
+  'arroz-tapado': { kcal: 587.4, p: 36.3, g: 490 },
+  'arroz-con-huevo-frito': { kcal: 531.9, p: 18.7, g: 360 },
+  'tallarin-guisado-con-pollo': { kcal: 573.5, p: 42.8, g: 592 },
+  'frejol-guisado': { kcal: 573.7, p: 24.6, g: 385 },
+  'segundo-de-pallares': { kcal: 573.6, p: 22.9, g: 385 },
+  'lentejas-guisadas': { kcal: 516.3, p: 22.3, g: 366 },
+  'tacu-tacu': { kcal: 520.8, p: 19.8, g: 465 },
+  'cau-cau': { kcal: 580.4, p: 32.1, g: 515 },
+  'locro-de-zapallo': { kcal: 395, p: 12, g: 470 },
+  'estofado-de-pollo': { kcal: 686.5, p: 51.9, g: 680 },
+  'adobo-de-chancho': { kcal: 604.4, p: 42.7, g: 375 },
+  'pescado-frito-con-arroz': { kcal: 817, p: 76.2, g: 540 },
+  'sudado-de-pescado': { kcal: 473.1, p: 47.1, g: 515 },
+  'chicharron-de-pescado': { kcal: 655.6, p: 48.2, g: 400 },
 };
 for (const p of platos) {
   const calc = calcularPlato(p, {}, foods, 1);
@@ -122,6 +162,17 @@ checkCerca('chupe con merluza', calcularPlato(chupe, { opciones: { pescado: 'mer
 const aguadito = platos.find((p) => p.id === 'aguadito-de-pollo');
 checkCerca('aguadito + mas arroz', calcularPlato(aguadito, { extras: ['mas-arroz'] }, foods, 1).totales.kcal, 719.3);
 
+// ---- Toda opcion tiene una alternativa que cambia el total ----
+const opcionesInutiles = [];
+for (const p of platos) {
+  for (const o of p.opciones ?? []) {
+    const baseKcal = calcularPlato(p, {}, foods, 1).totales.kcal;
+    const cambian = o.alternativas.filter((a) => Math.abs(calcularPlato(p, { opciones: { [o.id]: a.id } }, foods, 1).totales.kcal - baseKcal) > 1);
+    if (cambian.length === 0) opcionesInutiles.push(p.id + ':' + o.id);
+  }
+}
+check('toda opcion tiene una alternativa que cambia el total', opcionesInutiles, []);
+
 // ---- Escalado por factor ----
 const arroz = platos.find((p) => p.id === 'arroz-con-pollo');
 const doble = calcularPlato(arroz, {}, foods, 2);
@@ -137,6 +188,21 @@ check('factor con plato 0 -> 1', factorParaPresupuesto(0, 500), 1);
 check('factor con NaN -> 1', factorParaPresupuesto(Number.NaN, 500), 1);
 check('texto de 1 porcion', textoPorcion(1), '1 porcion');
 check('texto de 0,85', textoPorcion(0.85), '0,85 porciones');
+
+// ---- Regla de la casa: 1 sopa + 1 segundo por comida ----
+check('rol: una sopa es sopa', rolDePlato({ grupo: 'Sopas' }), 'sopa');
+check('rol: un segundo es segundo', rolDePlato({ grupo: 'Pollos y carnes' }), 'segundo');
+check('NO se admiten 2 segundos', puedeAgregarPlato('segundo', ['segundo']), false);
+check('sopa + segundo conviven', puedeAgregarPlato('sopa', ['segundo']), true);
+check('segundo + sopa conviven', puedeAgregarPlato('segundo', ['sopa']), true);
+check('NO se admiten 2 sopas', puedeAgregarPlato('sopa', ['sopa']), false);
+check('comida vacia acepta ambos', [puedeAgregarPlato('sopa', []), puedeAgregarPlato('segundo', [])], [true, true]);
+check('rolesEnComida resuelve por NOMBRE',
+  rolesEnComida([{ nombre: 'Aguadito de pollo' }, { nombre: 'Lomo saltado' }, { nombre: 'huevo' }], platos),
+  ['sopa', 'segundo']);
+check('hay 15 sopas y 45 segundos',
+  platos.filter((p) => rolDePlato(p) === 'sopa').length + '/' + platos.filter((p) => rolDePlato(p) === 'segundo').length,
+  '15/45');
 
 console.log('=== Recetario de platos: verificacion ===');
 if (fallos.length) {

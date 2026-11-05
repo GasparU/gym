@@ -620,6 +620,672 @@
         { "nombre": "Leche evaporada entera", "gramos": 40 },
         { "nombre": "Caldo de res*", "gramos": 200 }
       ]
+    },
+    {
+      "id": "pollo-a-la-brasa",
+      "nombre": "Pollo a la brasa",
+      "grupo": "Pollos y carnes",
+      "nota": "Un cuarto de pollo con papas. La piel es la mitad de la grasa: si la sacas, resta ~90 kcal.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 250 },
+        { "nombre": "Papa blanca", "gramos": 150 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Ají panca", "gramos": 10 },
+        { "nombre": "Chicha de jora", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Cominos", "gramos": 1 },
+        { "nombre": "Pimienta negra", "gramos": 1 }
+      ],
+      "extras": [
+        {
+          "id": "cremas",
+          "etiqueta": "+ cremas",
+          "ingredientes": [
+            { "nombre": "Leche evaporada entera", "gramos": 30 },
+            { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pollada",
+      "nombre": "Pollada",
+      "grupo": "Pollos y carnes",
+      "nota": "La pollada se adereza con ají panca y limón y se fríe. Si la haces al horno, resta ~80 kcal.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 200 },
+        { "nombre": "Ají panca", "gramos": 15 },
+        { "nombre": "Limón, jugo de", "gramos": 20 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 15 },
+        { "nombre": "Papa blanca", "gramos": 150 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Cominos", "gramos": 1 }
+      ],
+      "extras": [
+        {
+          "id": "mas-papa",
+          "etiqueta": "+ mas papa",
+          "ingredientes": [
+            { "nombre": "Papa blanca", "gramos": 100 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chicharron-de-pollo",
+      "nombre": "Chicharrón de pollo",
+      "grupo": "Pollos y carnes",
+      "nota": "Se empaniza con harina y se fríe. Pesa el pollo CRUDO antes de empanizar.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 180 },
+        { "nombre": "Trigo, harina fortificada con hierro de", "gramos": 20 },
+        { "nombre": "Huevo de gallina entero, crudo", "gramos": 25 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 20 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Pimienta negra", "gramos": 1 }
+      ],
+      "opciones": [
+        {
+          "id": "acomp",
+          "etiqueta": "Acompañamiento",
+          "porDefecto": "papas",
+          "alternativas": [
+            {
+              "id": "papas",
+              "etiqueta": "Papas fritas",
+              "ingredientes": [
+                { "nombre": "Papa blanca", "gramos": 150 },
+                { "nombre": "Aceite vegetal de soya", "gramos": 10 }
+              ]
+            },
+            {
+              "id": "yuca",
+              "etiqueta": "Yuca",
+              "ingredientes": [
+                { "nombre": "Yuca blanca fresca sin cáscara", "gramos": 150 }
+              ]
+            },
+            {
+              "id": "ensalada",
+              "etiqueta": "Ensalada",
+              "ingredientes": [
+                { "nombre": "Lechuga americana", "gramos": 60 },
+                { "nombre": "Tomate redondo, con cáscara", "gramos": 60 }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pollo-al-horno-con-papas",
+      "nombre": "Pollo al horno con papas",
+      "grupo": "Pollos y carnes",
+      "nota": "Al horno no lleva aceite extra si dejas la piel. La papa absorbe la grasa del pollo.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 220 },
+        { "nombre": "Papa blanca", "gramos": 180 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 10 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Orégano fresco", "gramos": 2 },
+        { "nombre": "Pimienta negra", "gramos": 1 }
+      ]
+    },
+    {
+      "id": "milanesa-de-pollo",
+      "nombre": "Milanesa de pollo",
+      "grupo": "Pollos y carnes",
+      "nota": "Lleva huevo y harina. Si la horneas en vez de freírla, baja ~70 kcal.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 150 },
+        { "nombre": "Trigo, harina fortificada con hierro de", "gramos": 20 },
+        { "nombre": "Huevo de gallina entero, crudo", "gramos": 30 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 15 },
+        { "nombre": "Papa blanca", "gramos": 150 },
+        { "nombre": "Limón, jugo de", "gramos": 10 }
+      ]
+    },
+    {
+      "id": "lomo-saltado",
+      "nombre": "Lomo saltado",
+      "grupo": "Pollos y carnes",
+      "nota": "El plato más pesado de la lista: papas fritas + arroz. Con la mitad de arroz baja ~110 kcal.",
+      "ingredientes": [
+        { "nombre": "Res, carne pulpa de", "gramos": 150 },
+        { "nombre": "Papa blanca", "gramos": 200 },
+        { "nombre": "Cebolla de cabeza", "gramos": 50 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 50 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 15 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 150 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 }
+      ],
+      "observaciones": [
+        {
+          "ingrediente": "Sillao (salsa de soya)",
+          "detalle": "No esta en la tabla. Una cucharada son ~5 kcal.",
+          "aproxKcal": 5
+        }
+      ]
+    },
+    {
+      "id": "bistec-a-lo-pobre",
+      "nombre": "Bistec a lo pobre",
+      "grupo": "Pollos y carnes",
+      "nota": "Bistec + papas + huevo + arroz: es un plato de fuerza. Bueno después de entrenar.",
+      "ingredientes": [
+        { "nombre": "Res, carne pulpa de", "gramos": 150 },
+        { "nombre": "Papa blanca", "gramos": 200 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 150 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 15 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Pimienta negra", "gramos": 1 }
+      ]
+    },
+    {
+      "id": "anticuchos",
+      "nombre": "Anticuchos",
+      "grupo": "Pollos y carnes",
+      "nota": "Se hacen con corazón de res, que es carne magra. El aderezo es ají panca.",
+      "ingredientes": [
+        { "nombre": "Res, corazón de", "gramos": 150 },
+        { "nombre": "Ají panca", "gramos": 15 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Cominos", "gramos": 1 },
+        { "nombre": "Papa blanca", "gramos": 200 },
+        { "nombre": "Maíz, grano fresco (choclo)", "gramos": 100 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 }
+      ],
+      "observaciones": [
+        {
+          "ingrediente": "Vinagre",
+          "detalle": "No esta en la tabla. Una cucharada son ~3 kcal.",
+          "aproxKcal": 3
+        }
+      ]
+    },
+    {
+      "id": "chicharron-de-cerdo",
+      "nombre": "Chicharrón de cerdo",
+      "grupo": "Pollos y carnes",
+      "nota": "El chicharrón ya viene frito en su grasa: 602 kcal por 100 g. Es el plato más graso de todos.",
+      "ingredientes": [
+        { "nombre": "Chicharrón de cerdo (cocido)", "gramos": 150 },
+        { "nombre": "Camote amarillo sin cáscara", "gramos": 100 },
+        { "nombre": "Maíz, grano fresco (choclo)", "gramos": 80 },
+        { "nombre": "Limón, jugo de", "gramos": 10 }
+      ]
+    },
+    {
+      "id": "albondigas-en-salsa",
+      "nombre": "Albóndigas en salsa",
+      "grupo": "Pollos y carnes",
+      "nota": "La carne se pesa CRUDA. La salsa es tomate + cebolla, sin mayonesa.",
+      "ingredientes": [
+        { "nombre": "Res, carne pulpa de", "gramos": 120 },
+        { "nombre": "Huevo de gallina entero, crudo", "gramos": 25 },
+        { "nombre": "Trigo, harina fortificada con hierro de", "gramos": 15 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 80 },
+        { "nombre": "Cebolla de cabeza", "gramos": 40 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 150 }
+      ]
+    },
+    {
+      "id": "carne-guisada-con-papa",
+      "nombre": "Carne guisada con papa",
+      "grupo": "Pollos y carnes",
+      "nota": "Guiso de todos los días. Con papa amarilla espesa sola, sin harina.",
+      "ingredientes": [
+        { "nombre": "Res, carne pulpa de", "gramos": 130 },
+        { "nombre": "Papa blanca", "gramos": 200 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 60 },
+        { "nombre": "Cebolla de cabeza", "gramos": 40 },
+        { "nombre": "Ají panca", "gramos": 10 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 150 }
+      ]
+    },
+    {
+      "id": "pollo-al-sillao",
+      "nombre": "Pollo al sillao",
+      "grupo": "Pollos y carnes",
+      "nota": "Chifa de casa. El sillao no está en la tabla: va declarado abajo y se suma aparte.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 200 },
+        { "nombre": "Cebolla de cabeza", "gramos": 40 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 40 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 150 },
+        { "nombre": "Cebollita china", "gramos": 20 }
+      ],
+      "observaciones": [
+        {
+          "ingrediente": "Sillao (salsa de soya)",
+          "detalle": "No esta en la tabla. Dos cucharadas son ~10 kcal.",
+          "aproxKcal": 10
+        }
+      ]
+    },
+    {
+      "id": "papa-a-la-huancaina",
+      "nombre": "Papa a la huancaína",
+      "grupo": "Entradas y guarniciones",
+      "nota": "La crema lleva queso y galleta de soda (es el espesante real, no la leche sola).",
+      "ingredientes": [
+        { "nombre": "Papa blanca", "gramos": 200 },
+        { "nombre": "Queso fresco de vaca", "gramos": 40 },
+        { "nombre": "Leche evaporada entera", "gramos": 40 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 20 },
+        { "nombre": "Galleta de soda (salada)", "gramos": 15 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Lechuga americana", "gramos": 30 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }
+      ],
+      "extras": [
+        {
+          "id": "aceituna",
+          "etiqueta": "+ aceituna",
+          "ingredientes": [
+            { "nombre": "Aceituna de botija", "gramos": 15 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "causa-limenya",
+      "nombre": "Causa limeña",
+      "grupo": "Entradas y guarniciones",
+      "nota": "La papa amarilla se aplasta con ají y limón. Rellena de pollo y palta.",
+      "ingredientes": [
+        { "nombre": "Papa amarilla sin cáscara", "gramos": 200 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 15 },
+        { "nombre": "Limón, jugo de", "gramos": 15 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Pollo, carne pulpa", "gramos": 80 },
+        { "nombre": "Palta", "gramos": 40 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 30 }
+      ]
+    },
+    {
+      "id": "ensalada-rusa",
+      "nombre": "Ensalada rusa",
+      "grupo": "Entradas y guarniciones",
+      "nota": "La mayonesa es lo que la hace pesada. Acá va con aceite y la mayonesa se declara aparte.",
+      "ingredientes": [
+        { "nombre": "Papa blanca", "gramos": 120 },
+        { "nombre": "Zanahoria", "gramos": 60 },
+        { "nombre": "Arveja, fresca sin vaina", "gramos": 40 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Limón, jugo de", "gramos": 10 }
+      ],
+      "observaciones": [
+        {
+          "ingrediente": "Mayonesa",
+          "detalle": "No esta en la tabla. Una cucharada son ~90 kcal: pesala aparte.",
+          "aproxKcal": 90
+        }
+      ]
+    },
+    {
+      "id": "papa-camote-y-choclo",
+      "nombre": "Papa, camote y choclo sancochados",
+      "grupo": "Entradas y guarniciones",
+      "nota": "El acompañamiento clásico de casa. Todo sancochado, sin aceite.",
+      "ingredientes": [
+        { "nombre": "Papa blanca", "gramos": 150 },
+        { "nombre": "Camote amarillo sin cáscara", "gramos": 100 },
+        { "nombre": "Maíz, grano fresco (choclo)", "gramos": 120 },
+        { "nombre": "Queso fresco de vaca", "gramos": 30 }
+      ]
+    },
+    {
+      "id": "ensalada-fresca",
+      "nombre": "Ensalada fresca",
+      "grupo": "Entradas y guarniciones",
+      "nota": "Llena mucho y gasta pocas calorías: es la mejor entrada si tienes hambre antes de comer.",
+      "ingredientes": [
+        { "nombre": "Lechuga americana", "gramos": 80 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 80 },
+        { "nombre": "Palta", "gramos": 40 },
+        { "nombre": "Limón, jugo de", "gramos": 15 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 }
+      ]
+    },
+    {
+      "id": "choclo-con-queso",
+      "nombre": "Choclo con queso",
+      "grupo": "Entradas y guarniciones",
+      "nota": "Simple y llenador. El choclo es el carbohidrato y el queso la proteína.",
+      "ingredientes": [
+        { "nombre": "Maíz, grano fresco (choclo)", "gramos": 200 },
+        { "nombre": "Queso fresco de vaca", "gramos": 40 },
+        { "nombre": "Limón, jugo de", "gramos": 5 }
+      ]
+    },
+    {
+      "id": "papa-rellena",
+      "nombre": "Papa rellena",
+      "grupo": "Entradas y guarniciones",
+      "nota": "La papa se aplasta y se rellena de carne. Se fríe: por eso el aceite pesa.",
+      "ingredientes": [
+        { "nombre": "Papa blanca", "gramos": 200 },
+        { "nombre": "Res, carne pulpa de", "gramos": 100 },
+        { "nombre": "Huevo de gallina entero, crudo", "gramos": 30 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 15 },
+        { "nombre": "Trigo, harina fortificada con hierro de", "gramos": 10 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ají panca", "gramos": 5 }
+      ]
+    },
+    {
+      "id": "salchipapa",
+      "nombre": "Salchipapa",
+      "grupo": "Entradas y guarniciones",
+      "nota": "Papas fritas + salchicha. Es el plato con más grasa por porción después del chicharrón.",
+      "ingredientes": [
+        { "nombre": "Papa blanca", "gramos": 200 },
+        { "nombre": "Salchicha blanca chica", "gramos": 80 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 15 }
+      ],
+      "observaciones": [
+        {
+          "ingrediente": "Mayonesa / ketchup",
+          "detalle": "Ninguna esta en la tabla. Una cucharada de mayonesa son ~90 kcal.",
+          "aproxKcal": 90
+        }
+      ]
+    },
+    {
+      "id": "ensalada-de-pallares",
+      "nombre": "Ensalada de pallares",
+      "grupo": "Entradas y guarniciones",
+      "nota": "Pesa el pallar CRUDO: rinde casi el triple. Mucha fibra y proteína vegetal.",
+      "ingredientes": [
+        { "nombre": "Pallar seco", "gramos": 60 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 40 },
+        { "nombre": "Limón, jugo de", "gramos": 15 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Culantro sin tallo", "gramos": 5 }
+      ]
+    },
+    {
+      "id": "tallarin-saltado",
+      "nombre": "Tallarín saltado",
+      "grupo": "Arroces y fideos",
+      "nota": "El fideo va SANCOCHADO en la tabla: pesá el tallarín ya cocido (triplica el crudo).",
+      "ingredientes": [
+        { "nombre": "Fideo tallarín sancochado fortiticado con hierro", "gramos": 300 },
+        { "nombre": "Res, carne pulpa de", "gramos": 120 },
+        { "nombre": "Cebolla de cabeza", "gramos": 40 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 40 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 15 }
+      ],
+      "observaciones": [
+        {
+          "ingrediente": "Sillao (salsa de soya)",
+          "detalle": "No esta en la tabla. Dos cucharadas son ~10 kcal.",
+          "aproxKcal": 10
+        }
+      ]
+    },
+    {
+      "id": "sopa-seca",
+      "nombre": "Sopa seca",
+      "grupo": "Arroces y fideos",
+      "nota": "Se llama sopa pero es un plato de fideo. El fideo de la tabla es SANCOCHADO.",
+      "ingredientes": [
+        { "nombre": "Fideo tallarín sancochado fortiticado con hierro", "gramos": 250 },
+        { "nombre": "Pollo, carne pulpa", "gramos": 120 },
+        { "nombre": "Cebolla de cabeza", "gramos": 40 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 60 },
+        { "nombre": "Ají panca", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Albahaca sin tallo", "gramos": 5 }
+      ]
+    },
+    {
+      "id": "arroz-tapado",
+      "nombre": "Arroz tapado",
+      "grupo": "Arroces y fideos",
+      "nota": "Arroz moldeado con relleno de carne. Las pasas y la aceituna son lo que le da el punto.",
+      "ingredientes": [
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 250 },
+        { "nombre": "Res, carne pulpa de", "gramos": 120 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 40 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 30 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Pasa sin pepa", "gramos": 10 }
+      ],
+      "extras": [
+        {
+          "id": "aceituna",
+          "etiqueta": "+ aceituna",
+          "ingredientes": [
+            { "nombre": "Aceituna de botija", "gramos": 10 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "arroz-con-huevo-frito",
+      "nombre": "Arroz con huevo frito",
+      "grupo": "Arroces y fideos",
+      "nota": "El plato de emergencia de fin de mes. El aceite del huevo frito no es opcional: cuenta.",
+      "ingredientes": [
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 250 },
+        { "nombre": "Huevo de gallina entero, crudo", "gramos": 100 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 }
+      ]
+    },
+    {
+      "id": "tallarin-guisado-con-pollo",
+      "nombre": "Tallarín guisado con pollo",
+      "grupo": "Arroces y fideos",
+      "nota": "Como el tallarín saltado pero con salsa de tomate. Fideo SANCOCHADO.",
+      "ingredientes": [
+        { "nombre": "Fideo tallarín sancochado fortiticado con hierro", "gramos": 300 },
+        { "nombre": "Pollo, carne pulpa", "gramos": 150 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 80 },
+        { "nombre": "Cebolla de cabeza", "gramos": 40 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Orégano fresco", "gramos": 2 }
+      ]
+    },
+    {
+      "id": "frejol-guisado",
+      "nombre": "Frejol guisado",
+      "grupo": "Menestras",
+      "nota": "Pesa el frejol CRUDO y déjalo remojar. Con arroz aparte es el segundo clásico.",
+      "ingredientes": [
+        { "nombre": "Frejol canario", "gramos": 80 },
+        { "nombre": "Papa blanca", "gramos": 100 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Ají panca", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 150 }
+      ]
+    },
+    {
+      "id": "segundo-de-pallares",
+      "nombre": "Segundo de pallares",
+      "grupo": "Menestras",
+      "nota": "Pallar CRUDO. Es la menestra con más proteína de la tabla (20 g por 100 g).",
+      "ingredientes": [
+        { "nombre": "Pallar seco", "gramos": 80 },
+        { "nombre": "Papa blanca", "gramos": 100 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 150 }
+      ]
+    },
+    {
+      "id": "lentejas-guisadas",
+      "nombre": "Lentejas guisadas",
+      "grupo": "Menestras",
+      "nota": "Distinto de la sopa: acá el arroz va aparte y la lenteja va espesa.",
+      "ingredientes": [
+        { "nombre": "Lentejas chicas", "gramos": 70 },
+        { "nombre": "Papa blanca", "gramos": 100 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 150 },
+        { "nombre": "Pimienta negra", "gramos": 1 }
+      ]
+    },
+    {
+      "id": "tacu-tacu",
+      "nombre": "Tacu tacu",
+      "grupo": "Menestras",
+      "nota": "Se hace con frejol YA cocido y arroz del día anterior. No se desperdicia nada.",
+      "ingredientes": [
+        { "nombre": "Frejol canario cocido", "gramos": 150 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 200 },
+        { "nombre": "Cebolla de cabeza", "gramos": 40 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 15 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }
+      ]
+    },
+    {
+      "id": "cau-cau",
+      "nombre": "Cau cau",
+      "grupo": "Guisos y segundos",
+      "nota": "Lleva mondongo, que es carne magra y barata. Si no te gusta, va igual con pollo.",
+      "ingredientes": [
+        { "nombre": "Res, panza cocida**", "gramos": 120 },
+        { "nombre": "Papa blanca", "gramos": 180 },
+        { "nombre": "Cebolla de cabeza", "gramos": 40 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 10 },
+        { "nombre": "Huacatay sin tallo", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 150 }
+      ]
+    },
+    {
+      "id": "locro-de-zapallo",
+      "nombre": "Locro de zapallo",
+      "grupo": "Guisos y segundos",
+      "nota": "El zapallo espesa solo. Con queso y leche evaporada queda cremoso sin harina.",
+      "ingredientes": [
+        { "nombre": "Zapallo criollo", "gramos": 250 },
+        { "nombre": "Papa blanca", "gramos": 100 },
+        { "nombre": "Queso fresco de vaca", "gramos": 30 },
+        { "nombre": "Leche evaporada entera", "gramos": 40 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 }
+      ]
+    },
+    {
+      "id": "estofado-de-pollo",
+      "nombre": "Estofado de pollo",
+      "grupo": "Guisos y segundos",
+      "nota": "Guiso con papa y zanahoria. Con presa con hueso rinde más, pero se pesa igual.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 200 },
+        { "nombre": "Papa blanca", "gramos": 150 },
+        { "nombre": "Zanahoria", "gramos": 60 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 60 },
+        { "nombre": "Cebolla de cabeza", "gramos": 40 },
+        { "nombre": "Ají panca", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 150 }
+      ]
+    },
+    {
+      "id": "adobo-de-chancho",
+      "nombre": "Adobo de chancho",
+      "grupo": "Guisos y segundos",
+      "nota": "Lleva chicha de jora y ají panca. Se come con pan, no con arroz.",
+      "ingredientes": [
+        { "nombre": "Cerdo, carne magra, cruda*", "gramos": 150 },
+        { "nombre": "Ají panca", "gramos": 20 },
+        { "nombre": "Cebolla de cabeza", "gramos": 50 },
+        { "nombre": "Chicha de jora", "gramos": 60 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 },
+        { "nombre": "Pan campesino de Lima", "gramos": 80 }
+      ]
+    },
+    {
+      "id": "pescado-frito-con-arroz",
+      "nombre": "Pescado frito con arroz",
+      "grupo": "Pescados",
+      "nota": "El pescado se pesa CRUDO. Con merluza queda más liviano que con bonito.",
+      "ingredientes": [
+        { "nombre": "Pescado bonito", "gramos": 150 },
+        { "nombre": "Trigo, harina fortificada con hierro de", "gramos": 10 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 15 },
+        { "nombre": "Arroz pilado o pulido cocido", "gramos": 200 },
+        { "nombre": "Limón, jugo de", "gramos": 15 }
+      ],
+      "opciones": [
+        {
+          "id": "pescado",
+          "etiqueta": "Pescado",
+          "porDefecto": "bonito",
+          "alternativas": [
+            {
+              "id": "bonito",
+              "etiqueta": "Bonito",
+              "ingredientes": [
+                { "nombre": "Pescado bonito", "gramos": 150 }
+              ]
+            },
+            {
+              "id": "merluza",
+              "etiqueta": "Merluza (mas liviana)",
+              "ingredientes": [
+                { "nombre": "Pescado merluza, fresco", "gramos": 150 }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sudado-de-pescado",
+      "nombre": "Sudado de pescado",
+      "grupo": "Pescados",
+      "nota": "Se cocina en su jugo con tomate y ají: casi sin aceite, es la preparación más liviana.",
+      "ingredientes": [
+        { "nombre": "Pescado bonito", "gramos": 180 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 100 },
+        { "nombre": "Cebolla de cabeza", "gramos": 50 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 15 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Papa blanca", "gramos": 150 },
+        { "nombre": "Limón, jugo de", "gramos": 15 }
+      ]
+    },
+    {
+      "id": "chicharron-de-pescado",
+      "nombre": "Chicharrón de pescado",
+      "grupo": "Pescados",
+      "nota": "Se empaniza con harina y se fríe. Con merluza baja bastante el total.",
+      "ingredientes": [
+        { "nombre": "Pescado bonito", "gramos": 180 },
+        { "nombre": "Trigo, harina fortificada con hierro de", "gramos": 25 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 20 },
+        { "nombre": "Limón, jugo de", "gramos": 15 },
+        { "nombre": "Papa blanca", "gramos": 150 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 10 }
+      ]
     }
   ]
 }
