@@ -63,6 +63,33 @@ MUTS = [
      "create policy daily_summary_all on daily_summary",
      "-- create policy daily_summary_all on daily_summary",
      "sql: política de acceso"),
+
+    ("M14 comidas = entradas (no tipos distintos)", "src/logic/resumen.ts",
+     "if (fila.tipoComida) acc.comidas.add(fila.tipoComida);", "acc.comidas.add('x');",
+     "detalle: comidas DISTINTAS"),
+
+    ("M15 el derivado pisa al resumen guardado", "src/logic/resumen.ts",
+     "for (const b of base ?? []) porFecha.set(b.fecha, b);",
+     "for (const d of derivados ?? []) porFecha.set(d.fecha, d);",
+     "union: el resumen guardado manda"),
+
+    ("M16 el detalle acepta fechas basura", "src/logic/resumen.ts",
+     "const fecha = fechaValida(fila?.fecha);", "const fecha = fila?.fecha as string;",
+     "detalle: dos dias"),
+
+    ("M17 el panel ignora el detalle", "src/components/DietModule.tsx",
+     "() => completarResumenes(resumenes, detalleSemana),", "() => resumenes,",
+     "ui: el panel UNE resumen guardado + detalle"),
+
+    ("M18 el detalle no trae el tipo de comida", "src/services/cloudSync.ts",
+     "select('fecha,tipo_comida,kcal,proteinas,grasa,carbohidratos,fibra')",
+     "select('fecha,kcal,proteinas,grasa,carbohidratos,fibra')",
+     "cloud: el detalle sale de daily_meals"),
+
+    ("M19 el aviso no cae al detalle", "src/components/DietModule.tsx",
+     "const ultimoDiaEfectivo = ultimoConDatos(resumenesEfectivos, hoyReal) ?? ultimoDia;",
+     "const ultimoDiaEfectivo = ultimoDia;",
+     "ui: el aviso cae al detalle si no hay resumen"),
 ]
 
 

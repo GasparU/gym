@@ -175,6 +175,107 @@ export function resumenDelDia(
   };
 }
 
+/** Una fila CRUDA de `daily_meals` (el detalle, no el resumen). */
+export interface FilaDetalleDia {
+  fecha: string;
+  tipoComida: string;
+  kcal: number;
+  proteinas: number;
+  grasa: number;
+  carbohidratos: number;
+  fibra: number;
+}
+
+/**
+ * Reconstruye el resumen de cada día a partir del DETALLE.
+ *
+ * Por qué existe: `daily_summary` es un atajo que se empezó a escribir el
+ * 05/11/2026, así que los días cargados ANTES no tienen fila (y si el guardado
+ * falla por red, el día desaparecía del panel). El detalle es la fuente de
+ * verdad: lo que no tenga resumen guardado sale de acá.
+ */
+export function resumenesDesdeDetalle(
+  filas: FilaDetalleDia[],
+  objetivos: ObjetivosDelDia,
+): DaySummary[] {
+  const porFecha = new Map<
+    string,
+    {
+      kcal: number;
+      proteina: number;
+      grasa: number;
+      carbohidratos: number;
+      fibra: number;
+      entradas: number;
+      comidas: Set<string>;
+    }
+  >();
+
+  for (const fila of filas ?? []) {
+    const fecha = fechaValida(fila?.fecha);
+    if (!fecha) continue;
+    const acc = porFecha.get(fecha) ?? {
+      kcal: 0,
+      proteina: 0,
+      grasa: 0,
+      carbohidratos: 0,
+      fibra: 0,
+      entradas: 0,
+      comidas: new Set<string>(),
+    };
+    acc.kcal += numero(fila.kcal);
+    acc.proteina += numero(fila.proteinas);
+    acc.grasa += numero(fila.grasa);
+    acc.carbohidratos += numero(fila.carbohidratos);
+    acc.fibra += numero(fila.fibra);
+    acc.entradas++;
+    if (fila.tipoComida) acc.comidas.add(fila.tipoComida);
+    porFecha.set(fecha, acc);
+  }
+
+  const tdee = numero(objetivos?.tdeeKcal);
+  const meta = numero(objetivos?.metaKcal);
+
+  return Array.from(porFecha.entries())
+    .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
+    .map(([fecha, acc]) => {
+      const kcal = Math.round(acc.kcal);
+      return {
+        fecha,
+        kcal,
+        proteina: redondear(acc.proteina, 1),
+        grasa: redondear(acc.grasa, 1),
+        carbohidratos: redondear(acc.carbohidratos, 1),
+        fibra: redondear(acc.fibra, 1),
+        metaKcal: Math.round(meta),
+        tdeeKcal: Math.round(tdee),
+        deficitPlanificado: tdee > 0 && meta > 0 ? Math.round(tdee - meta) : null,
+        deficitReal: deficitRealKcal(tdee, kcal, acc.entradas),
+        comidas: acc.comidas.size,
+        entradas: acc.entradas,
+      };
+    });
+}
+
+/**
+ * Une el resumen GUARDADO con el derivado del detalle.
+ *
+ * El guardado MANDA (tiene las metas de ese día); el derivado completa los días
+ * que no tienen fila. Así el cuadro semanal no pierde ningún día, haya o no
+ * resumen guardado.
+ */
+export function completarResumenes(
+  base: DaySummary[],
+  derivados: DaySummary[],
+): DaySummary[] {
+  const porFecha = new Map<string, DaySummary>();
+  for (const d of derivados ?? []) porFecha.set(d.fecha, d);
+  for (const b of base ?? []) porFecha.set(b.fecha, b);
+  return Array.from(porFecha.values()).sort((a, b) =>
+    a.fecha < b.fecha ? -1 : a.fecha > b.fecha ? 1 : 0,
+  );
+}
+
 /** Fila para Supabase (nombres reales de las columnas). */
 export function filaDesdeResumen(r: DaySummary): Record<string, unknown> {
   return {

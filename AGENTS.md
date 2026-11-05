@@ -199,9 +199,18 @@ Si estabas mirando un día pasado, NO te mueve de lugar.
 - **Resumen por día (`daily_summary`, 1 fila por fecha)**: kcal, macros, fibra, meta, TDEE, déficit
 planificado (TDEE − meta) y **déficit real (TDEE − consumido)**. El desglose por comida NO se duplica:
 se deriva de `daily_meals` (`resumenPorComida`). Peso: ~1 KB por día.
+- **El cuadro semanal NO depende del resumen guardado (bug del 05/11/2026)**: `daily_summary` es un
+**atajo**, no la verdad. Medido contra la base: la tabla tenía **0 filas** y ayer tenía **5 filas** en
+`daily_meals`, así que el panel mostraba `—` en un día con datos (al abrirlo sí aparecía, porque el día
+activo se calcula en vivo). Ahora `loadMealsRange(desde, hasta)` trae el **detalle** de los 14 días y
+`resumenesDesdeDetalle(...)` lo agrupa por fecha; `completarResumenes(guardados, derivados)` los une
+(**el guardado manda**: tiene las metas de ese día; el derivado completa los que no tienen fila).
+Si el resumen no se puede guardar (sin red, tabla nueva), el día **sigue apareciendo**.
+Verificado con datos reales: 5 filas → `2026-11-04 · 1.085 kcal · déficit 1.411 · 93,8 g`.
 - **Núcleo puro** `src/logic/resumen.ts`: `totalDelDia`, `resumenPorComida`, `deficitRealKcal`,
-`resumenDelDia`, `filaDesdeResumen`/`resumenDesdeFila`, `fechaMas`, `etiquetaFecha`, `ultimoConDatos`,
-`promedioSemanal`, `conResumen`/`sinResumen`. **Sin imports** (se corre directo desde el gate de Node).
+`resumenDelDia`, `resumenesDesdeDetalle`, `completarResumenes`, `filaDesdeResumen`/`resumenDesdeFila`,
+`fechaMas`, `etiquetaFecha`, `ultimoConDatos`, `promedioSemanal`, `conResumen`/`sinResumen`.
+**Sin imports de runtime** (se corre directo desde el gate de Node).
 - **Regla dura**: un día **sin cargar NO es un día con déficit 0**. `deficitReal` queda `null`, la semana
 solo promedia los días con datos (`diasConDatos`) y si no hay ninguno el promedio es `null`. Un día que
 se queda vacío **borra su fila** (`deleteDailySummary`).
@@ -212,8 +221,8 @@ se queda vacío **borra su fila** (`deleteDailySummary`).
 `79.88`. `DietModule` usa `numEsMax(proteinaBaseG, 1)`.
 - **PASO MANUAL**: correr `supabase/2026-11-05_resumen_diario.sql` (tabla + RLS + índice). Sin él la app
 sigue funcionando (el historial del navegador se ve), pero el resumen **no viaja entre equipos**.
-- Gate nuevo `scripts/verify-resumen.mjs` (**89**) + `verify-dieta.mjs` actualizado; mutaciones
-`scripts/mutaciones-resumen.py` (**13/13 ROJAS por aserción**). `npm run verify` suma el gate.
+- Gate nuevo `scripts/verify-resumen.mjs` (**116**) + `verify-dieta.mjs` actualizado; mutaciones
+`scripts/mutaciones-resumen.py` (**19/19 ROJAS por aserción**). `npm run verify` suma el gate.
 - **Límites declarados**: no hay clic real (gate + `tsc` + `astro build`); al editar un día pasado el
 resumen usa las metas **vigentes** (no se versiona el histórico de metas); el panel muestra 7 días pero
 se cargan 14; un día sin datos fuera de la ventana no entra.
@@ -307,7 +316,7 @@ se cargan 14; un día sin datos fuera de la ventana no entra.
 - **Valores dorados congelados** en `scripts/verify-platos.mjs` (**287 aserciones**): 60 platos base +
   variantes + escalado por factor + porcion por presupuesto + la regla sopa/segundo.
 - **Gates**: `npm run verify` (metabolismo 146 · alimentos 34 · platos 324 · cableado 55 · dieta 43 ·
-  resumen 89) y
+  resumen 116) y
   `npm run verify:types` (`tsc -p tsconfig.check.json`, excluye `backups/`).
   Mutaciones `scripts/mutaciones-clasificacion.py`: **18/18 ROJAS**. El runner ahora aplica **todas** las
   apariciones del patron (antes exigia 1 y las anclas fragiles dejaban mutaciones sin aplicar).

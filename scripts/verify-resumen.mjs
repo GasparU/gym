@@ -17,6 +17,8 @@ import {
   promedioSemanal,
   conResumen,
   sinResumen,
+  resumenesDesdeDetalle,
+  completarResumenes,
 } from '../src/logic/resumen.ts';
 import { readFileSync } from 'node:fs';
 
@@ -168,6 +170,36 @@ check('conResumen: el día reemplazado manda', conResumen(LISTA, dia('2026-11-04
 check('conResumen: ordena por fecha', conResumen([dia('2026-11-04', 1, 1)], dia('2026-11-02', 2, 2))[0].fecha, '2026-11-02');
 check('sinResumen: saca el día', sinResumen(LISTA, '2026-11-04').length, 1);
 
+// ------------------------------------------------- detalle -> resumen (bug 05/11)
+// El cuadro semanal salia vacio con dias que SI tenian comidas: el resumen solo
+// se escribia al editar, asi que lo cargado antes no existia en `daily_summary`.
+const DETALLE = [
+  { fecha: '2026-11-04', tipoComida: 'desayuno', kcal: 300, proteinas: 20, grasa: 10, carbohidratos: 30, fibra: 5 },
+  { fecha: '2026-11-04', tipoComida: 'almuerzo', kcal: 500, proteinas: 40, grasa: 20, carbohidratos: 40, fibra: 8 },
+  { fecha: '2026-11-04', tipoComida: 'almuerzo', kcal: 285, proteinas: 33.8, grasa: 5, carbohidratos: 0, fibra: 0 },
+  { fecha: '2026-11-03', tipoComida: 'cena', kcal: 400, proteinas: 30, grasa: 15, carbohidratos: 20, fibra: 4 },
+  { fecha: '2026-11-04T00:00:00', tipoComida: 'cena', kcal: 100, proteinas: 5, grasa: 2, carbohidratos: 10, fibra: 1 },
+  { fecha: 'basura', tipoComida: 'cena', kcal: 999, proteinas: 0, grasa: 0, carbohidratos: 0, fibra: 0 },
+];
+const METAS = { metaKcal: 2122, tdeeKcal: 2496 };
+const DER = resumenesDesdeDetalle(DETALLE, METAS);
+check('detalle: dos dias (ignora la fecha basura y la ISO)', DER.length, 2);
+check('detalle: ordenado', DER[0].fecha, '2026-11-03');
+check('detalle: kcal del dia', DER[1].kcal, 1185);
+check('detalle: proteina', DER[1].proteina, 98.8);
+check('detalle: comidas DISTINTAS (no entradas)', DER[1].comidas, 3);
+check('detalle: entradas', DER[1].entradas, 4);
+check('detalle: deficit real', DER[1].deficitReal, 1311);
+check('detalle: sin filas -> []', resumenesDesdeDetalle([], METAS), []);
+
+const UNION = completarResumenes([dia('2026-11-04', 999, 1497)], DER);
+check('union: dos dias', UNION.length, 2);
+check('union: el resumen guardado manda', UNION[1].kcal, 999);
+check('union: el detalle completa el dia que falta', UNION[0].fecha, '2026-11-03');
+check('union: sin base queda lo derivado', completarResumenes([], DER).length, 2);
+check('union: sin derivados queda la base', completarResumenes([dia('2026-11-04', 1, 1)], []).length, 1);
+check('union: ordena por fecha', completarResumenes([dia('2026-11-05', 1, 1)], [dia('2026-11-01', 2, 2)])[0].fecha, '2026-11-01');
+
 // ---------------------------------------------------------------- cableado
 check('cloud: guarda el resumen', /export async function saveDailySummary/.test(CLOUD_SRC), true);
 check('cloud: borra el resumen de un día vacío', /export async function deleteDailySummary/.test(CLOUD_SRC), true);
@@ -177,6 +209,9 @@ check('cloud: escribe en daily_summary', /\.from\('daily_summary'\)\.upsert\(/.t
 check('cloud: upsert por fecha', /onConflict: 'fecha'/.test(CLOUD_SRC), true);
 check('cloud: el último día excluye los vacíos', /\.gt\('entradas', 0\)/.test(CLOUD_SRC), true);
 check('cloud: la ventana es por rango de fechas', /\.gte\('fecha', desde\)[\s\S]{0,200}\.lte\('fecha', hasta\)/.test(CLOUD_SRC), true);
+check('cloud: lee el DETALLE por rango', /export async function loadMealsRange/.test(CLOUD_SRC), true);
+check('cloud: el detalle sale de daily_meals', /\.from\('daily_meals'\)[\s\S]{0,120}select\('fecha,tipo_comida/.test(CLOUD_SRC), true);
+check('cloud: el detalle filtra por fecha', /\.gte\('fecha', desde\)/.test(CLOUD_SRC), true);
 
 check('ui: hay fecha activa', /fechaActiva/.test(COMP_SRC), true);
 check('ui: hay reloj de día real', /setInterval\(revisar, 30_000\)/.test(COMP_SRC), true);
@@ -196,6 +231,17 @@ check('ui: avisa cuando hoy está vacío', /Hoy todavía no cargaste nada/.test(
 check('ui: ya NO lee solo la fecha de hoy', /claveCache\(fechaHoy\)/.test(COMP_SRC), false);
 check('ui: ya NO carga solo la fecha de hoy', /loadMealsForDate\(fechaHoy\)/.test(COMP_SRC), false);
 check('ui: el mínimo de peso va con coma decimal', /numEsMax\(targets\.proteinaBaseG, 1\)/.test(COMP_SRC), true);
+
+check('ui: el historial pide tambien el detalle', /loadMealsRange\(desde, hoyReal\)/.test(COMP_SRC), true);
+check('ui: el detalle se convierte en resumenes', /resumenesDesdeDetalle\(filas,/.test(COMP_SRC), true);
+check('ui: el panel UNE resumen guardado + detalle', /completarResumenes\(resumenes, detalleSemana\)/.test(COMP_SRC), true);
+check('ui: la semana usa la union', /promedioSemanal\(resumenesEfectivos/.test(COMP_SRC), true);
+check('ui: la semana ya no usa solo el resumen guardado', /promedioSemanal\(resumenes,/.test(COMP_SRC), false);
+check('ui: la tabla usa la union', /resumenesEfectivos\.find\(/.test(COMP_SRC), true);
+check('ui: el aviso cae al detalle si no hay resumen', /ultimoConDatos\(resumenesEfectivos, hoyReal\) \?\? ultimoDia/.test(COMP_SRC), true);
+check('ui: el aviso abre el dia con datos', /cambiarDia\(ultimoDiaEfectivo\.fecha\)/.test(COMP_SRC), true);
+check('ui: guardar el resumen actualiza las dos listas', /setDetalleSemana\(\(prev\) => conResumen\(prev, r\)\)/.test(COMP_SRC), true);
+check('ui: borrar el resumen limpia las dos listas', /setDetalleSemana\(\(prev\) => sinResumen\(prev, fecha\)\)/.test(COMP_SRC), true);
 
 check('sql: crea la tabla', /create table if not exists daily_summary/.test(SQL_SRC), true);
 check('sql: una fila por fecha', /fecha\s+date primary key/.test(SQL_SRC), true);

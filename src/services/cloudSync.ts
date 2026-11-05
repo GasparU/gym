@@ -7,6 +7,7 @@ import {
   filaDesdeResumen,
   resumenDesdeFila,
   type DaySummary,
+  type FilaDetalleDia,
 } from '../logic/resumen';
 import type { ExerciseLog } from '../types/workout';
 
@@ -223,6 +224,44 @@ export async function loadLatestSummary(
     return null;
   }
   return data && data[0] ? resumenDesdeFila(data[0]) : null;
+}
+
+/**
+ * Filas CRUDAS de `daily_meals` entre dos fechas.
+ *
+ * Es la FUENTE DE VERDAD del historial: `daily_summary` es un atajo, así que los
+ * días cargados antes de que existiera (o que no se pudieron resumir por red)
+ * se reconstruyen desde acá. Sin esto, el cuadro semanal mostraba "—" en días
+ * que sí tenían comidas guardadas (medido el 05/11/2026: ayer tenía 5 filas y el
+ * panel salía vacío porque `daily_summary` estaba en 0).
+ */
+export async function loadMealsRange(
+  desde: string,
+  hasta: string,
+): Promise<FilaDetalleDia[]> {
+  const { data, error } = await supabase
+    .from('daily_meals')
+    .select('fecha,tipo_comida,kcal,proteinas,grasa,carbohidratos,fibra')
+    .gte('fecha', desde)
+    .lte('fecha', hasta)
+    .order('fecha', { ascending: true });
+
+  if (error) {
+    console.warn('No se pudo leer el detalle del historial:', error.message);
+    return [];
+  }
+
+  return (data ?? [])
+    .map((fila) => ({
+      fecha: String(fila.fecha ?? '').slice(0, 10),
+      tipoComida: String(fila.tipo_comida ?? ''),
+      kcal: Number(fila.kcal) || 0,
+      proteinas: Number(fila.proteinas) || 0,
+      grasa: Number(fila.grasa) || 0,
+      carbohidratos: Number(fila.carbohidratos) || 0,
+      fibra: Number(fila.fibra) || 0,
+    }))
+    .filter((fila) => /^\d{4}-\d{2}-\d{2}$/.test(fila.fecha));
 }
 
 // 5. Guardar serie y volumen de entrenamiento

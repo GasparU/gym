@@ -24,6 +24,7 @@ import {
   deleteDailySummary,
   loadSummaries,
   loadLatestSummary,
+  loadMealsRange,
   getTodayDateString,
 } from "../services/cloudSync";
 import {
@@ -35,6 +36,7 @@ import {
   type Meals,
 } from "../logic/dieta";
 import {
+  completarResumenes,
   conResumen,
   sinResumen,
   deficitRealKcal,
@@ -42,6 +44,8 @@ import {
   fechaMas,
   promedioSemanal,
   resumenDelDia,
+  resumenesDesdeDetalle,
+  ultimoConDatos,
   DIAS_VENTANA,
   type DaySummary,
 } from "../logic/resumen";
@@ -233,6 +237,9 @@ export const DietModule: React.FC = () => {
   );
   const [editandoPasado, setEditandoPasado] = useState(false);
   const [resumenes, setResumenes] = useState<DaySummary[]>([]);
+  // Resumen reconstruido desde el DETALLE (`daily_meals`): cubre los dias que no
+  // tienen fila en `daily_summary` (cargados antes del 05/11/2026 o sin red).
+  const [detalleSemana, setDetalleSemana] = useState<DaySummary[]>([]);
   const [ultimoDia, setUltimoDia] = useState<DaySummary | null>(null);
   // Un día pasado se abre en SOLO LECTURA: así no se reescribe el historial por
   // accidente. El botón "Editar este día" lo habilita de forma explícita.
@@ -290,11 +297,17 @@ export const DietModule: React.FC = () => {
     if (r.entradas === 0) {
       // Un día vacío no es un día con déficit 0: se borra el resumen.
       const ok = await deleteDailySummary(fecha);
-      if (ok) setResumenes((prev) => sinResumen(prev, fecha));
+      if (ok) {
+    setResumenes((prev) => sinResumen(prev, fecha));
+    setDetalleSemana((prev) => sinResumen(prev, fecha));
+      }
       return;
     }
     const ok = await saveDailySummary(r);
-    if (ok) setResumenes((prev) => conResumen(prev, r));
+    if (ok) {
+      setResumenes((prev) => conResumen(prev, r));
+      setDetalleSemana((prev) => conResumen(prev, r));
+    }
   };
 
   const programarResumen = (m: Meals, fecha: string) => {
@@ -406,20 +419,41 @@ export const DietModule: React.FC = () => {
     setFechaActiva(hoyReal);
   }, [hoyReal]);
 
-  // Historial: últimos 14 días (para la tabla) + el último día con datos.
-  useEffect(() => {
-    let vivo = true;
-    Promise.all([loadSummaries(14, hoyReal), loadLatestSummary(hoyReal)])
-      .then(([lista, ultimo]) => {
-        if (!vivo) return;
-        setResumenes(lista);
-        setUltimoDia(ultimo);
-      })
-      .catch(() => undefined);
-    return () => {
-      vivo = false;
-    };
-  }, [hoyReal]);
+      // Historial: últimos 14 días. Se leen las DOS fuentes y se unen:
+      //   1) `daily_summary` (atajo, manda cuando existe)
+      //   2) `daily_meals` agrupado por fecha (fuente de verdad; cubre los días sin resumen)
+      // Sin (2) el cuadro mostraba "—" en días que SÍ tenían comidas guardadas.
+      useEffect(() => {
+        let vivo = true;
+        const desde = fechaMas(hoyReal, -13);
+        Promise.all([
+          loadSummaries(14, hoyReal),
+          loadLatestSummary(hoyReal),
+          loadMealsRange(desde, hoyReal),
+        ])
+          .then(([lista, ultimo, filas]) => {
+            if (!vivo) return;
+            setResumenes(lista);
+            setUltimoDia(ultimo);
+            setDetalleSemana(
+              resumenesDesdeDetalle(filas, {
+                metaKcal: targets.metaCalorica,
+                tdeeKcal: targets.tdee,
+              }),
+            );
+          })
+          .catch(() => undefined);
+        return () => {
+          vivo = false;
+        };
+      }, [hoyReal, targets.metaCalorica, targets.tdee]);
+
+      // El panel usa la UNIÓN: el resumen guardado manda, el detalle completa.
+      const resumenesEfectivos = useMemo(
+        () => completarResumenes(resumenes, detalleSemana),
+        [resumenes, detalleSemana],
+      );
+      const ultimoDiaEfectivo = ultimoConDatos(resumenesEfectivos, hoyReal) ?? ultimoDia;
 
   // Guardar perfil al actualizar
   const handleUpdateProfile = (newProfile: UserProfile) => {
@@ -557,9 +591,9 @@ export const DietModule: React.FC = () => {
   // --- Progreso: déficit del día ACTIVO + ventana de 7 días (05/11/2026) ---
   // El déficit REAL es TDEE − lo consumido (el "planificado" es TDEE − meta).
   // Las tarjetas siguen al día que estás mirando, no siempre a hoy.
-  const semana = promedioSemanal(resumenes, hoyReal, DIAS_VENTANA);
+  const semana = promedioSemanal(resumenesEfectivos, hoyReal, DIAS_VENTANA);
   const resumenActivo =
-    resumenes.find((r) => r.fecha === fechaActiva) ?? null;
+    resumenesEfectivos.find((r) => r.fecha === fechaActiva) ?? null;
       const hayComida = allEntries.length > 0;
       // Ya cargó y está vacío: se muestra "—", no el último resumen (evita
       // seguir mostrando números de comidas que el usuario acaba de borrar).
@@ -574,7 +608,7 @@ export const DietModule: React.FC = () => {
         (diaVacio ? null : (resumenActivo?.deficitReal ?? null));
   const filasSemana = Array.from({ length: DIAS_VENTANA }, (_, i) => {
     const fecha = fechaMas(hoyReal, -(DIAS_VENTANA - 1 - i));
-    const guardado = resumenes.find((r) => r.fecha === fecha) ?? null;
+    const guardado = resumenesEfectivos.find((r) => r.fecha === fecha) ?? null;
     // El día ACTIVO se muestra con lo que hay en pantalla (recién cargado),
     // sin esperar al guardado del resumen.
     const esElDiaActivo = fecha === fechaActiva;
@@ -683,22 +717,22 @@ export const DietModule: React.FC = () => {
           </div>
 
           {/* 1.c Si HOY está vacío, se muestra lo último que cargaste (nunca una pantalla muda) */}
-          {esHoy && allEntries.length === 0 && ultimoDia && (
+          {esHoy && allEntries.length === 0 && ultimoDiaEfectivo && (
             <div className="rounded-xl border border-amber-700 bg-amber-950/40 px-4 py-3 text-sm text-amber-200 flex flex-wrap items-center gap-x-3 gap-y-2">
               <span>
                 Hoy todavía no cargaste nada. Lo último que registraste fue{" "}
-                <b>{etiquetaFecha(ultimoDia.fecha, hoyReal)}</b> ({ultimoDia.fecha}):{" "}
-                <b>{numEs(ultimoDia.kcal)} kcal</b>
-                {ultimoDia.deficitReal !== null && (
+                <b>{etiquetaFecha(ultimoDiaEfectivo.fecha, hoyReal)}</b> ({ultimoDiaEfectivo.fecha}):{" "}
+                <b>{numEs(ultimoDiaEfectivo.kcal)} kcal</b>
+                {ultimoDiaEfectivo.deficitReal !== null && (
                   <>
-                    {" "}· déficit real <b>{numEs(ultimoDia.deficitReal)} kcal</b>
+                    {" "}· déficit real <b>{numEs(ultimoDiaEfectivo.deficitReal)} kcal</b>
                   </>
                 )}
                 .
               </span>
               <button
                 type="button"
-                onClick={() => cambiarDia(ultimoDia.fecha)}
+                onClick={() => cambiarDia(ultimoDiaEfectivo.fecha)}
                 className="rounded-lg border border-amber-600 bg-amber-500/10 px-3 py-1.5 text-[11px] font-semibold text-amber-200 hover:bg-amber-500/20"
               >
                 Ver ese día
