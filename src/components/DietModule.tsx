@@ -20,6 +20,10 @@ import {
   loadLatestBodyMetrics,
   loadMealsForDate,
   saveMealDay,
+  saveDailySummary,
+  deleteDailySummary,
+  loadSummaries,
+  loadLatestSummary,
   getTodayDateString,
 } from "../services/cloudSync";
 import {
@@ -30,6 +34,17 @@ import {
   MEAL_TYPES,
   type Meals,
 } from "../logic/dieta";
+import {
+  conResumen,
+  sinResumen,
+  deficitRealKcal,
+  etiquetaFecha,
+  fechaMas,
+  promedioSemanal,
+  resumenDelDia,
+  DIAS_VENTANA,
+  type DaySummary,
+} from "../logic/resumen";
 
 // Datos reales del dueño (medidos el 03/11/2026): 99 kg, 175 cm, 44 a, 3 días.
 // El % de grasa (32,4) NO es un supuesto: sale de cintura 115 / cuello 44 por US Navy.
@@ -204,17 +219,25 @@ export const DietModule: React.FC = () => {
   // 2. Cálculo metabólico reactivo automático
   const targets = calculateMetabolicTargets(profile);
 
-  // 2.b. DIETA PERSISTENTE (04/11/2026). Antes `meals` nacía vacío en cada
-  // render: no se leía de ningún lado y el refresh borraba el día. Ahora hay
-  // 3 capas: localStorage (instantáneo, offline), Supabase (multi-equipo) y
-  // el estado de React (lo que ves). La caché de ESTE equipo manda para hoy.
-  const fechaHoy = useMemo(() => getTodayDateString(), []);
+  // 2.b. REGISTRO POR DÍA (05/11/2026). Antes se leía y escribía SOLO la fecha de
+  // hoy: al cambiar el día la pantalla aparecía vacía (el dato seguía en la base,
+  // pero no había manera de verlo). Ahora hay una fecha ACTIVA con navegación,
+  // un resumen por día en `daily_summary` y un panel de déficit semanal.
+  const [hoyReal, setHoyReal] = useState<string>(() => getTodayDateString());
+  const [fechaActiva, setFechaActiva] = useState<string>(() => getTodayDateString());
   const [meals, setMeals] = useState<Meals>(() =>
     typeof window === "undefined"
       ? mealsVacio()
       : (leerCacheDe(window.localStorage.getItem(claveCache(getTodayDateString()))) ??
         mealsVacio()),
   );
+  const [editandoPasado, setEditandoPasado] = useState(false);
+  const [resumenes, setResumenes] = useState<DaySummary[]>([]);
+  const [ultimoDia, setUltimoDia] = useState<DaySummary | null>(null);
+  // Un día pasado se abre en SOLO LECTURA: así no se reescribe el historial por
+  // accidente. El botón "Editar este día" lo habilita de forma explícita.
+  const esHoy = fechaActiva === hoyReal;
+  const soloLectura = !esHoy && !editandoPasado;
 
   // Regla de la casa: en una comida va UNA sopa y UN segundo (se suman, no se reemplazan).
   const rolesPorComida = useMemo(
@@ -236,9 +259,9 @@ export const DietModule: React.FC = () => {
   const colasNube = useRef<Partial<Record<MealType, Promise<unknown>>>>({});
   const [hidratado, setHidratado] = useState(false);
 
-  const guardarCache = (m: Meals) => {
+  const guardarCache = (m: Meals, fecha: string = fechaActiva) => {
     try {
-      window.localStorage.setItem(claveCache(fechaHoy), JSON.stringify(m));
+      window.localStorage.setItem(claveCache(fecha), JSON.stringify(m));
     } catch {
       /* modo privado o cuota llena: la nube sigue siendo el respaldo */
     }
@@ -251,38 +274,90 @@ export const DietModule: React.FC = () => {
       // Cola por comida: dos guardados seguidos no se pisan (delete + insert).
       const anterior = colasNube.current[mealType] ?? Promise.resolve();
       colasNube.current[mealType] = anterior
-        .then(() => saveMealDay(fechaHoy, mealType, entradas))
+        .then(() => saveMealDay(fechaActiva, mealType, entradas))
         .catch(() => undefined);
     }, 600);
+  };
+
+  // --- RESUMEN DIARIO (1 fila por día en `daily_summary`) -------------------
+  const timerResumen = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const guardarResumenDe = async (m: Meals, fecha: string): Promise<void> => {
+    const r = resumenDelDia(fecha, m, {
+      metaKcal: targets.metaCalorica,
+      tdeeKcal: targets.tdee,
+    });
+    if (r.entradas === 0) {
+      // Un día vacío no es un día con déficit 0: se borra el resumen.
+      const ok = await deleteDailySummary(fecha);
+      if (ok) setResumenes((prev) => sinResumen(prev, fecha));
+      return;
+    }
+    const ok = await saveDailySummary(r);
+    if (ok) setResumenes((prev) => conResumen(prev, r));
+  };
+
+  const programarResumen = (m: Meals, fecha: string) => {
+    if (timerResumen.current) clearTimeout(timerResumen.current);
+    timerResumen.current = setTimeout(() => {
+      void guardarResumenDe(m, fecha);
+    }, 900);
   };
 
   const persistir = (m: Meals, mealType: MealType) => {
     guardarCache(m);
     programarNube(mealType, m[mealType]);
+    programarResumen(m, fechaActiva);
   };
 
-  // Al abrir: si este equipo ya tiene el día en caché, MANDA la caché (y se
-  // sube, por si la nube quedó atrás). Si no, se baja de la nube.
+  /**
+   * Cambia el día del registro. El día que se DEJA se cierra guardando su
+   * resumen (solo si era hoy: el de un día pasado ya se guardó al editarlo y
+   * reescribirlo con las metas de hoy falsearía el historial).
+   */
+  const cambiarDia = (nueva: string) => {
+    if (!nueva || nueva === fechaActiva) return;
+    const destino = nueva > hoyReal ? hoyReal : nueva; // no hay futuro
+    if (fechaActiva === hoyReal) {
+      if (timerResumen.current) clearTimeout(timerResumen.current);
+      void guardarResumenDe(meals, fechaActiva);
+    }
+    // Se arranca con la caché del día destino; la nube llega en el efecto.
+    const local = leerCacheDe(window.localStorage.getItem(claveCache(destino)));
+    cambiosLocales.current = false;
+    setMeals(local ?? mealsVacio());
+    setEditandoPasado(false);
+    setHidratado(false);
+    setFechaActiva(destino);
+  };
+
+  // Al abrir un día: para HOY manda la caché de este equipo (y se sube); para un
+  // día PASADO manda la nube (el pasado ya está cerrado), con la caché como
+  // respaldo si no hay red.
   useEffect(() => {
     let vivo = true;
-    const local = leerCacheDe(window.localStorage.getItem(claveCache(fechaHoy)));
+    const local = leerCacheDe(window.localStorage.getItem(claveCache(fechaActiva)));
     const localTiene = !!local && MEAL_TYPES.some((t) => local[t].length > 0);
-    loadMealsForDate(fechaHoy).then((nube) => {
+    const esHoyDelReloj = fechaActiva === getTodayDateString();
+    loadMealsForDate(fechaActiva).then((nube) => {
       if (!vivo || cambiosLocales.current) return;
-      if (localTiene && local) {
+      const nubeTiene = !!nube && MEAL_TYPES.some((t) => (nube[t]?.length ?? 0) > 0);
+      if (esHoyDelReloj && localTiene && local) {
         MEAL_TYPES.forEach((t) => {
-          if (local[t].length > 0) void saveMealDay(fechaHoy, t, local[t]);
+          if (local[t].length > 0) void saveMealDay(fechaActiva, t, local[t]);
         });
-      } else if (nube) {
+      } else if (nubeTiene && nube) {
         setMeals(nube);
-        guardarCache(nube);
+        guardarCache(nube, fechaActiva);
+      } else if (localTiene && local) {
+        setMeals(local);
       }
       setHidratado(true);
     });
     return () => {
       vivo = false;
     };
-  }, [fechaHoy]);
+  }, [fechaActiva]);
 
   // Cuando llega el catálogo se recupera el `foodId` por NOMBRE y se recalculan
   // los macros con la tabla real (las filas de la nube no guardan foodId).
@@ -293,7 +368,58 @@ export const DietModule: React.FC = () => {
       guardarCache(normalizado);
       return normalizado;
     });
-  }, [foods, hidratado]);
+  }, [foods, hidratado, fechaActiva]);
+
+  // Reloj: se revisa el cambio de fecha cada 30 s y al volver a la pestaña.
+  // Sin esto, una pestaña abierta de noche seguía escribiendo en el día anterior.
+  useEffect(() => {
+    const revisar = () => {
+      const ahora = getTodayDateString();
+      setHoyReal((prev) => (prev === ahora ? prev : ahora));
+    };
+    const id = window.setInterval(revisar, 30_000);
+    document.addEventListener("visibilitychange", revisar);
+    window.addEventListener("focus", revisar);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", revisar);
+      window.removeEventListener("focus", revisar);
+    };
+  }, []);
+
+  // Cambio de día real (medianoche o pestaña que estuvo abierta): se cierra el
+  // día anterior con SUS datos y, si el usuario estaba parado ahí, se salta al
+  // día nuevo. Si estaba mirando un día pasado, NO se lo mueve de lugar.
+  const diaAnteriorRef = useRef(hoyReal);
+  useEffect(() => {
+    if (hoyReal === diaAnteriorRef.current) return;
+    const anterior = diaAnteriorRef.current;
+    diaAnteriorRef.current = hoyReal;
+    if (fechaActiva !== anterior) return;
+    if (timerResumen.current) clearTimeout(timerResumen.current);
+    void guardarResumenDe(meals, anterior);
+    const local = leerCacheDe(window.localStorage.getItem(claveCache(hoyReal)));
+    cambiosLocales.current = false;
+    setMeals(local ?? mealsVacio());
+    setEditandoPasado(false);
+    setHidratado(false);
+    setFechaActiva(hoyReal);
+  }, [hoyReal]);
+
+  // Historial: últimos 14 días (para la tabla) + el último día con datos.
+  useEffect(() => {
+    let vivo = true;
+    Promise.all([loadSummaries(14, hoyReal), loadLatestSummary(hoyReal)])
+      .then(([lista, ultimo]) => {
+        if (!vivo) return;
+        setResumenes(lista);
+        setUltimoDia(ultimo);
+      })
+      .catch(() => undefined);
+    return () => {
+      vivo = false;
+    };
+  }, [hoyReal]);
 
   // Guardar perfil al actualizar
   const handleUpdateProfile = (newProfile: UserProfile) => {
@@ -331,6 +457,7 @@ export const DietModule: React.FC = () => {
   }, []);
 
   const addPlatoToMeal = (mealType: MealType, plato: Plato, calc: PlatoCalculado) => {
+    if (soloLectura) return;
     // Doble candado: si esta comida ya tiene uno del mismo rol, no se agrega.
     if (!puedeAgregarPlato(rolDePlato(plato), rolesEnComida(meals[mealType], platos))) return;
     const nuevaEntrada: MealEntry = {
@@ -355,6 +482,7 @@ export const DietModule: React.FC = () => {
   };
 
   const addFoodToMeal = (mealType: MealType, food: FoodItem) => {
+    if (soloLectura) return;
     const defaultGrams = 100;
     const factor = defaultGrams / 100;
 
@@ -382,6 +510,7 @@ export const DietModule: React.FC = () => {
   };
 
   const updateGrams = (mealType: MealType, id: string, newGrams: number) => {
+    if (soloLectura) return;
     const siguiente: Meals = {
       ...meals,
       [mealType]: meals[mealType].map((item) => {
@@ -411,6 +540,7 @@ export const DietModule: React.FC = () => {
   };
 
   const removeEntry = (mealType: MealType, id: string) => {
+    if (soloLectura) return;
     const siguiente: Meals = {
       ...meals,
       [mealType]: meals[mealType].filter((item) => item.id !== id),
@@ -423,6 +553,51 @@ export const DietModule: React.FC = () => {
   const allEntries = [...meals.desayuno, ...meals.almuerzo, ...meals.cena];
   const totalAudit = computeMealTotals(allEntries);
   const reparto = repartoCalorico(targets);
+
+  // --- Progreso: déficit del día ACTIVO + ventana de 7 días (05/11/2026) ---
+  // El déficit REAL es TDEE − lo consumido (el "planificado" es TDEE − meta).
+  // Las tarjetas siguen al día que estás mirando, no siempre a hoy.
+  const semana = promedioSemanal(resumenes, hoyReal, DIAS_VENTANA);
+  const resumenActivo =
+    resumenes.find((r) => r.fecha === fechaActiva) ?? null;
+      const hayComida = allEntries.length > 0;
+      // Ya cargó y está vacío: se muestra "—", no el último resumen (evita
+      // seguir mostrando números de comidas que el usuario acaba de borrar).
+      const diaVacio = hidratado && !hayComida;
+      const kcalDia = hayComida
+        ? totalAudit.energiaTablaKcal
+        : diaVacio
+          ? null
+          : (resumenActivo?.kcal ?? null);
+      const deficitDia =
+        deficitRealKcal(targets.tdee, totalAudit.energiaTablaKcal, allEntries.length) ??
+        (diaVacio ? null : (resumenActivo?.deficitReal ?? null));
+  const filasSemana = Array.from({ length: DIAS_VENTANA }, (_, i) => {
+    const fecha = fechaMas(hoyReal, -(DIAS_VENTANA - 1 - i));
+    const guardado = resumenes.find((r) => r.fecha === fecha) ?? null;
+    // El día ACTIVO se muestra con lo que hay en pantalla (recién cargado),
+    // sin esperar al guardado del resumen.
+    const esElDiaActivo = fecha === fechaActiva;
+        const kcal = esElDiaActivo
+          ? hayComida
+            ? totalAudit.energiaTablaKcal
+            : diaVacio
+              ? null
+              : (guardado?.kcal ?? null)
+          : (guardado?.kcal ?? null);
+    const deficitReal = esElDiaActivo
+      ? (deficitRealKcal(targets.tdee, totalAudit.energiaTablaKcal, allEntries.length) ??
+        (diaVacio ? null : (guardado?.deficitReal ?? null)))
+      : (guardado?.deficitReal ?? null);
+        const proteina = esElDiaActivo
+          ? hayComida
+            ? totalAudit.proteinasG
+            : diaVacio
+              ? null
+              : (guardado?.proteina ?? null)
+          : (guardado?.proteina ?? null);
+    return { fecha, kcal, deficitReal, proteina };
+  });
 
   if (loading) {
     return (
@@ -447,7 +622,91 @@ export const DietModule: React.FC = () => {
         </p>
       )}
 
-          {/* 2. Resumen de Metas Diarias */}
+          {/* 1.b FECHA DEL REGISTRO (05/11/2026): antes solo existía HOY */}
+          <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => cambiarDia(fechaMas(fechaActiva, -1))}
+                aria-label="Día anterior"
+                className="rounded-lg border border-slate-600 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 hover:border-slate-400"
+              >
+                ◀
+              </button>
+              <input
+                type="date"
+                value={fechaActiva}
+                max={hoyReal}
+                onChange={(e) => cambiarDia(e.target.value)}
+                aria-label="Fecha del registro"
+                className="rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100 [color-scheme:dark] focus:outline-none focus:border-brand-500"
+              />
+              <button
+                type="button"
+                onClick={() => cambiarDia(fechaMas(fechaActiva, 1))}
+                disabled={fechaActiva >= hoyReal}
+                aria-label="Día siguiente"
+                className="rounded-lg border border-slate-600 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 hover:border-slate-400 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                ▶
+              </button>
+              {!esHoy && (
+                <button
+                  type="button"
+                  onClick={() => cambiarDia(hoyReal)}
+                  className="rounded-lg border border-brand-500 bg-brand-500/20 px-3 py-2 text-sm font-semibold text-brand-300"
+                >
+                  Hoy
+                </button>
+              )}
+            </div>
+            <span
+              className={`text-[11px] font-semibold ${
+                esHoy ? "text-emerald-400" : soloLectura ? "text-amber-300" : "text-amber-400"
+              }`}
+            >
+              {esHoy
+                ? "Registrando HOY"
+                : soloLectura
+                  ? "Día pasado · solo lectura (no se toca el historial)"
+                  : "Día pasado · EDICIÓN habilitada"}
+            </span>
+            {!esHoy && (
+              <button
+                type="button"
+                onClick={() => setEditandoPasado((v) => !v)}
+                className="ml-auto rounded-lg border border-slate-600 px-3 py-1.5 text-[11px] text-slate-300 hover:border-slate-400"
+              >
+                {soloLectura ? "✏️ Editar este día" : "🔒 Volver a solo lectura"}
+              </button>
+            )}
+          </div>
+
+          {/* 1.c Si HOY está vacío, se muestra lo último que cargaste (nunca una pantalla muda) */}
+          {esHoy && allEntries.length === 0 && ultimoDia && (
+            <div className="rounded-xl border border-amber-700 bg-amber-950/40 px-4 py-3 text-sm text-amber-200 flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span>
+                Hoy todavía no cargaste nada. Lo último que registraste fue{" "}
+                <b>{etiquetaFecha(ultimoDia.fecha, hoyReal)}</b> ({ultimoDia.fecha}):{" "}
+                <b>{numEs(ultimoDia.kcal)} kcal</b>
+                {ultimoDia.deficitReal !== null && (
+                  <>
+                    {" "}· déficit real <b>{numEs(ultimoDia.deficitReal)} kcal</b>
+                  </>
+                )}
+                .
+              </span>
+              <button
+                type="button"
+                onClick={() => cambiarDia(ultimoDia.fecha)}
+                className="rounded-lg border border-amber-600 bg-amber-500/10 px-3 py-1.5 text-[11px] font-semibold text-amber-200 hover:bg-amber-500/20"
+              >
+                Ver ese día
+              </button>
+            </div>
+          )}
+
+              {/* 2. Resumen de Metas Diarias */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 bg-slate-800/80 p-4 rounded-xl border border-slate-700">
             <div>
               <span className="text-xs text-slate-400 block">TMB Activa</span>
@@ -554,7 +813,7 @@ export const DietModule: React.FC = () => {
               </span>
               <span>
                 Proteína: <b className="text-slate-200">{numEs(targets.proteinaFactorGkg, 2)} g/kg</b>{" "}
-                sobre {targets.proteinaBaseG} kg{" "}
+                sobre {numEsMax(targets.proteinaBaseG, 1)} kg{" "}
                 {targets.masaLibreGrasa !== null ? "(masa libre de grasa)" : "(peso real)"}
               </span>
               <span>Grasa: 0,75 g/kg con piso del 20% de las kcal</span>
@@ -629,7 +888,104 @@ export const DietModule: React.FC = () => {
           />
         </div>
       </div>
-          {/* 3.5 Recetario: siempre a la vista */}
+          {/* 3.2 PROGRESO (05/11/2026): déficit real del día + ventana de 7 días */}
+          <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-4 space-y-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 className="text-sm font-semibold text-slate-200">Progreso · déficit</h3>
+              <span className="text-[11px] text-slate-400">
+                últimos {semana.diasVentana} días · {semana.diasConDatos} con datos
+              </span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="rounded-lg bg-slate-900/60 border border-slate-700 px-3 py-2">
+                <span className="text-[10px] uppercase tracking-wide text-slate-400">
+                  Consumido · {etiquetaFecha(fechaActiva, hoyReal)}
+                </span>
+                <span className="block text-lg font-bold text-emerald-400">
+                  {kcalDia === null ? "—" : `${numEs(kcalDia)} kcal`}
+                </span>
+                <span className="block text-[10px] text-slate-500">
+                  meta {numEs(targets.metaCalorica)} kcal
+                </span>
+              </div>
+              <div className="rounded-lg bg-slate-900/60 border border-slate-700 px-3 py-2">
+                <span className="text-[10px] uppercase tracking-wide text-slate-400">
+                  Déficit real · {etiquetaFecha(fechaActiva, hoyReal)}
+                </span>
+                <span
+                  className={`block text-lg font-bold ${
+                    deficitDia === null ? "text-slate-400" : deficitDia >= 0 ? "text-emerald-400" : "text-rose-400"
+                  }`}
+                >
+                  {deficitDia === null ? "—" : `${numEs(deficitDia)} kcal`}
+                </span>
+                <span className="block text-[10px] text-slate-500">
+                  TDEE {numEs(targets.tdee)} − comido
+                </span>
+              </div>
+              <div className="rounded-lg bg-slate-900/60 border border-slate-700 px-3 py-2">
+                <span className="text-[10px] uppercase tracking-wide text-slate-400">Promedio 7 días</span>
+                <span className="block text-lg font-bold text-sky-400">
+                  {semana.promedioDeficit === null ? "—" : `${numEs(semana.promedioDeficit)} kcal`}
+                </span>
+                <span className="block text-[10px] text-slate-500">
+                  {semana.diasConDatos > 0 ? `${semana.diasConDatos} día(s) cargados` : "sin días cargados"}
+                </span>
+              </div>
+              <div className="rounded-lg bg-slate-900/60 border border-slate-700 px-3 py-2">
+                <span className="text-[10px] uppercase tracking-wide text-slate-400">Grasa teórica</span>
+                <span className="block text-lg font-bold text-amber-400">
+                  {semana.kgTeoricos === null ? "—" : `${numEsMax(semana.kgTeoricos, 2)} kg`}
+                </span>
+                <span className="block text-[10px] text-slate-500">déficit acumulado / 7.700</span>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="text-slate-400 border-b border-slate-700">
+                  <tr>
+                    <th className="py-1.5 pr-3">Día</th>
+                    <th className="py-1.5 pr-3">Fecha</th>
+                    <th className="py-1.5 pr-3 text-right">Kcal</th>
+                    <th className="py-1.5 pr-3 text-right">Déficit real</th>
+                    <th className="py-1.5 text-right">Proteína</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700/50">
+                  {filasSemana.map((fila) => (
+                    <tr key={fila.fecha} className={fila.fecha === fechaActiva ? "bg-slate-700/30" : ""}>
+                      <td className="py-1.5 pr-3 text-slate-300">{etiquetaFecha(fila.fecha, hoyReal)}</td>
+                      <td className="py-1.5 pr-3 text-slate-500">{fila.fecha}</td>
+                      <td className="py-1.5 pr-3 text-right text-emerald-400">
+                        {fila.kcal === null ? "—" : numEs(fila.kcal)}
+                      </td>
+                      <td
+                        className={`py-1.5 pr-3 text-right ${
+                          fila.deficitReal === null
+                            ? "text-slate-500"
+                            : fila.deficitReal >= 0
+                              ? "text-emerald-400"
+                              : "text-rose-400"
+                        }`}
+                      >
+                        {fila.deficitReal === null ? "—" : `${numEs(fila.deficitReal)} kcal`}
+                      </td>
+                      <td className="py-1.5 text-right text-blue-400">
+                        {fila.proteina === null ? "—" : `${numEsMax(fila.proteina, 1)} g`}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-[10px] leading-snug text-slate-500">
+              Déficit real = gasto total (TDEE) − lo que comiste. Los días sin cargar no cuentan como 0.
+              7.700 kcal ≈ 1 kg de grasa: es una referencia teórica, no una promesa de balanza.
+            </p>
+          </div>
+
+              {/* 3.5 Recetario: siempre a la vista (se oculta en un día cerrado) */}
+              {!soloLectura && (
           <div className="bg-slate-800/80 border border-brand-500/40 rounded-xl p-4 space-y-2">
             <div className="flex items-center justify-between gap-3">
               <h4 className="text-base font-semibold text-slate-100">🍲 Recetario criollo</h4>
@@ -646,6 +1002,7 @@ export const DietModule: React.FC = () => {
               onElegir={(plato) => setPlatoAbierto({ plato, mealType: comidaPorHora() })}
             />
           </div>
+          )}
 
       {/* 4. Tablas por Comida */}
       {(["desayuno", "almuerzo", "cena"] as MealType[]).map((mealType) => (
@@ -665,7 +1022,12 @@ export const DietModule: React.FC = () => {
             </span>
           </div>
 
-              <div className="flex gap-2">
+                  {soloLectura && (
+                    <p className="text-[11px] text-amber-300/90">
+                      Día cerrado: no se agrega ni se modifica nada. Tocá "✏️ Editar este día" arriba si te equivocaste.
+                    </p>
+                  )}
+                  <div className={`flex gap-2 ${soloLectura ? "hidden" : ""}`}>
                 {(["alimento", "plato"] as const).map((m) => (
                   <button
                     key={m}
@@ -683,6 +1045,7 @@ export const DietModule: React.FC = () => {
                 ))}
               </div>
 
+              <div className={soloLectura ? "hidden" : undefined}>
               {(modo[mealType] ?? "alimento") === "alimento" ? (
                 <AutocompleteFood
                   foods={foods}
@@ -695,6 +1058,7 @@ export const DietModule: React.FC = () => {
                   onElegir={(plato) => setPlatoAbierto({ plato, mealType })}
                 />
               )}
+              </div>
 
           {meals[mealType].length > 0 && (
             <div className="overflow-x-auto">
@@ -744,6 +1108,7 @@ export const DietModule: React.FC = () => {
                         <input
                           type="number"
                           value={item.gramos}
+                          disabled={soloLectura}
                           onChange={(e) =>
                             updateGrams(
                               mealType,
@@ -767,12 +1132,14 @@ export const DietModule: React.FC = () => {
                         {item.carbohidratos}
                       </td>
                       <td className="py-2 px-3 text-center">
+                        {!soloLectura && (
                         <button
                           onClick={() => removeEntry(mealType, item.id)}
                           className="text-rose-400 hover:text-rose-300 font-bold px-1"
                         >
                           ✕
                         </button>
+                        )}
                       </td>
                     </tr>
                   ))}

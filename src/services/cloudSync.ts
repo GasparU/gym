@@ -2,6 +2,12 @@ import { supabase } from '../lib/supabase';
 import type { UserProfile, MetabolicResult } from '../logic/metabolism';
 import type { MealEntry, MealType } from '../types/nutrition';
 import { entradasDesdeFilas, filasDesdeEntradas, type Meals } from '../logic/dieta';
+import {
+  fechaMas,
+  filaDesdeResumen,
+  resumenDesdeFila,
+  type DaySummary,
+} from '../logic/resumen';
 import type { ExerciseLog } from '../types/workout';
 
 // Obtener fecha actual en formato YYYY-MM-DD local
@@ -148,7 +154,78 @@ export async function saveMealDay(
   return true;
 }
 
-// 4. Guardar serie y volumen de entrenamiento
+// 4. RESUMEN DIARIO (05/11/2026)
+//    Una fila por dia en `daily_summary`: totales + metas + deficit. El desglose
+//    por comida NO se duplica (vive en `daily_meals`). Asi el historial se lee
+//    con 1 fila por dia en vez de cientos de filas de alimentos.
+
+export async function saveDailySummary(resumen: DaySummary): Promise<boolean> {
+  const { error } = await supabase.from('daily_summary').upsert(
+    { ...filaDesdeResumen(resumen), actualizado_en: new Date().toISOString() },
+    { onConflict: 'fecha' },
+  );
+  if (error) {
+    console.warn('No se pudo guardar el resumen del dia:', error.message);
+    return false;
+  }
+  return true;
+}
+
+/** Borra el resumen de un dia (el usuario vacio todo: no hay dato que mostrar). */
+export async function deleteDailySummary(fecha: string): Promise<boolean> {
+  const { error } = await supabase.from('daily_summary').delete().eq('fecha', fecha);
+  if (error) {
+    console.warn('No se pudo borrar el resumen del dia:', error.message);
+    return false;
+  }
+  return true;
+}
+
+/** Ultimos `dias` resumenes (incluye hoy). Se usa para el panel de progreso. */
+export async function loadSummaries(
+  dias = 14,
+  hasta = getTodayDateString(),
+): Promise<DaySummary[]> {
+  const desde = fechaMas(hasta, -(dias - 1));
+  const { data, error } = await supabase
+    .from('daily_summary')
+    .select('*')
+    .gte('fecha', desde)
+    .lte('fecha', hasta)
+    .order('fecha', { ascending: true });
+
+  if (error) {
+    console.warn('No se pudo leer el resumen diario:', error.message);
+    return [];
+  }
+  return (data ?? [])
+    .map((fila) => resumenDesdeFila(fila))
+    .filter((r): r is DaySummary => r !== null);
+}
+
+/**
+ * Ultimo dia CON DATOS antes de `antesDe`. Sirve para el aviso "hoy esta vacio".
+ * Filtra en la consulta (`entradas > 0`) para no traer dias en blanco.
+ */
+export async function loadLatestSummary(
+  antesDe = getTodayDateString(),
+): Promise<DaySummary | null> {
+  const { data, error } = await supabase
+    .from('daily_summary')
+    .select('*')
+    .lt('fecha', antesDe)
+    .gt('entradas', 0)
+    .order('fecha', { ascending: false })
+    .limit(1);
+
+  if (error) {
+    console.warn('No se pudo leer el ultimo resumen:', error.message);
+    return null;
+  }
+  return data && data[0] ? resumenDesdeFila(data[0]) : null;
+}
+
+// 5. Guardar serie y volumen de entrenamiento
 export async function syncWorkoutLog(
   rutinaId: string,
   ejercicioId: string,

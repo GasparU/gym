@@ -162,6 +162,16 @@ function limitar(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n));
 }
 
+/**
+ * Número -> texto es-PE con coma decimal y sin ceros de cola (73.5 -> "73,5").
+ * Se define acá y no se importa de `formato.ts` a propósito: este módulo queda
+ * SIN imports para poder correrlo directo desde los gates de Node.
+ */
+function formatoEs(n: number, decimales = 1): string {
+  if (!Number.isFinite(n)) return '—';
+  return String(Number(n.toFixed(decimales))).replace('.', ',');
+}
+
 export function calculateMetabolicTargets(u: UserProfile): MetabolicResult {
   const avisos: string[] = [];
 
@@ -183,7 +193,7 @@ export function calculateMetabolicTargets(u: UserProfile): MetabolicResult {
   const aguaLitros = aguaDiariaLitros(u.peso, imc, pesoIdeal);
   if (imc >= 30 && pesoIdeal > 0) {
     avisos.push(
-      `Agua calculada con la fórmula de sobrepeso (peso ideal ${pesoIdeal} kg), no 35 ml/kg.`,
+      `Agua calculada con la fórmula de sobrepeso (peso ideal ${formatoEs(pesoIdeal, 1)} kg), no 35 ml/kg.`,
     );
   }
 
@@ -211,7 +221,7 @@ export function calculateMetabolicTargets(u: UserProfile): MetabolicResult {
     tmb = redondear(370 + 21.6 * masaLibreGrasa);
     formulaTmb = 'KATCH_MCARDLE';
     avisos.push(
-      `TMB con Katch-McArdle sobre ${masaLibreGrasa} kg de masa libre de grasa.`,
+      `TMB con Katch-McArdle sobre ${formatoEs(masaLibreGrasa, 1)} kg de masa libre de grasa.`,
     );
   } else {
     tmb = redondear(10 * u.peso + 6.25 * u.talla - 5 * u.edad + constSexo);
@@ -222,7 +232,7 @@ export function calculateMetabolicTargets(u: UserProfile): MetabolicResult {
   }
   if (aplicaPesoAjustado) {
     avisos.push(
-      `El peso ajustado (${pesoAjustado} kg) queda como referencia: no se usa para la TMB.`,
+      `El peso ajustado (${formatoEs(pesoAjustado, 1)} kg) queda como referencia: no se usa para la TMB.`,
     );
   }
 
@@ -236,7 +246,7 @@ export function calculateMetabolicTargets(u: UserProfile): MetabolicResult {
     factorActividad = factorPorDias(u.diasEntrenamiento);
     factorActividadFuente = 'DIAS';
     avisos.push(
-      `Factor de actividad ${factorActividad} asumido por los días de entrenamiento. Si tu trabajo es sedentario, elegí "Sedentario" (1,2): puede mover ~250 kcal/día.`,
+      `Factor de actividad ${formatoEs(factorActividad, 3)} asumido por los días de entrenamiento. Si tu trabajo es sedentario, elegí "Sedentario" (1,2): puede mover ~250 kcal/día.`,
     );
   }
 

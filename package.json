@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "verify": "node scripts/verify-metabolism.mjs && node scripts/verify-alimentos.mjs && node scripts/verify-platos.mjs && node scripts/verify-wiring.mjs && node scripts/verify-dieta.mjs",
+    "verify": "node scripts/verify-metabolism.mjs && node scripts/verify-alimentos.mjs && node scripts/verify-platos.mjs && node scripts/verify-wiring.mjs && node scripts/verify-dieta.mjs && node scripts/verify-resumen.mjs",
     "verify:types": "npx -y -p typescript@5 tsc -p tsconfig.check.json --noEmit",
     "build": "astro build",
     "preview": "astro preview",

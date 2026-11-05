@@ -184,6 +184,40 @@ fuente de verdad.
 - Gate nuevo `scripts/verify-dieta.mjs` (**42 aserciones**) + `verify-metabolism.mjs` (**135**);
   mutaciones `scripts/mutaciones-dieta.py` (**5/5 ROJAS por aserción**).
 
+## Historial diario y progreso semanal — el día ya no "desaparece" (05/11/2026)
+
+- **El bug (medido)**: el registro estaba bien guardado por fecha (`daily_meals` +
+`user_meals_v1_<fecha>`), pero la app leía y escribía **solo la fecha de HOY** (`fechaHoy` calculada una
+vez). Al cambiar el día la pantalla aparecía vacía: el dato existía y no había forma de verlo.
+- **Fecha ACTIVA con navegación**: ◀ / 📅 / ▶ / Hoy. Un día pasado abre en **SOLO LECTURA**; el botón
+"✏️ Editar este día" lo habilita de forma explícita (así no se reescribe el historial por accidente).
+- **Si HOY está vacío no queda una pantalla muda**: un aviso muestra el **último día con datos**
+(`loadLatestSummary`) con sus kcal y su déficit, y un botón para abrirlo.
+- **Cambio de fecha automático**: cada 30 s (y al volver a la pestaña) se compara la fecha real. Si cambió,
+se **cierra el día anterior guardando su resumen** y, si estabas parado ahí, se salta al día nuevo.
+Si estabas mirando un día pasado, NO te mueve de lugar.
+- **Resumen por día (`daily_summary`, 1 fila por fecha)**: kcal, macros, fibra, meta, TDEE, déficit
+planificado (TDEE − meta) y **déficit real (TDEE − consumido)**. El desglose por comida NO se duplica:
+se deriva de `daily_meals` (`resumenPorComida`). Peso: ~1 KB por día.
+- **Núcleo puro** `src/logic/resumen.ts`: `totalDelDia`, `resumenPorComida`, `deficitRealKcal`,
+`resumenDelDia`, `filaDesdeResumen`/`resumenDesdeFila`, `fechaMas`, `etiquetaFecha`, `ultimoConDatos`,
+`promedioSemanal`, `conResumen`/`sinResumen`. **Sin imports** (se corre directo desde el gate de Node).
+- **Regla dura**: un día **sin cargar NO es un día con déficit 0**. `deficitReal` queda `null`, la semana
+solo promedia los días con datos (`diasConDatos`) y si no hay ninguno el promedio es `null`. Un día que
+se queda vacío **borra su fila** (`deleteDailySummary`).
+- **Panel "Progreso · déficit"**: consumido y déficit del **día activo**, promedio y kg teóricos de los
+últimos 7 días, y la tabla día por día. 7.700 kcal ≈ 1 kg de grasa se declara como referencia teórica.
+- **Formato es-PE también en los avisos**: `metabolism.ts` gana `formatoEs` (local, para no romper el
+"sin imports" del módulo) → `73,5 kg`, `66,9 kg`, `79,9 kg`, `1,375`. Antes salían `73.5`, `66.92`,
+`79.88`. `DietModule` usa `numEsMax(proteinaBaseG, 1)`.
+- **PASO MANUAL**: correr `supabase/2026-11-05_resumen_diario.sql` (tabla + RLS + índice). Sin él la app
+sigue funcionando (el historial del navegador se ve), pero el resumen **no viaja entre equipos**.
+- Gate nuevo `scripts/verify-resumen.mjs` (**89**) + `verify-dieta.mjs` actualizado; mutaciones
+`scripts/mutaciones-resumen.py` (**13/13 ROJAS por aserción**). `npm run verify` suma el gate.
+- **Límites declarados**: no hay clic real (gate + `tsc` + `astro build`); al editar un día pasado el
+resumen usa las metas **vigentes** (no se versiona el histórico de metas); el panel muestra 7 días pero
+se cargan 14; un día sin datos fuera de la ventana no entra.
+
 ## Clasificación de alimentos, agua y actividad (04/11/2026)
 
 - **La "mina de oro" es `AlimentosClasificados.xlsx`, NO el PDF.** Aporta **5 columnas que el JSON no tenia**:
@@ -272,7 +306,8 @@ fuente de verdad.
   resta ~150 kcal. **No se descuenta solo.**
 - **Valores dorados congelados** en `scripts/verify-platos.mjs` (**287 aserciones**): 60 platos base +
   variantes + escalado por factor + porcion por presupuesto + la regla sopa/segundo.
-- **Gates**: `npm run verify` (metabolismo 146 · alimentos 34 · platos 287 · cableado 51 · dieta 43) y
+- **Gates**: `npm run verify` (metabolismo 146 · alimentos 34 · platos 324 · cableado 55 · dieta 43 ·
+  resumen 89) y
   `npm run verify:types` (`tsc -p tsconfig.check.json`, excluye `backups/`).
   Mutaciones `scripts/mutaciones-clasificacion.py`: **18/18 ROJAS**. El runner ahora aplica **todas** las
   apariciones del patron (antes exigia 1 y las anclas fragiles dejaban mutaciones sin aplicar).

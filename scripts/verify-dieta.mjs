@@ -116,8 +116,8 @@ check('cloud: LEE daily_meals con la fecha', /from\('daily_meals'\)[\s\S]{0,200}
 check('cloud: ya NO usa el insert suelto', /export async function syncMealEntry/.test(CLOUD_SRC), false);
 check('cloud: borra antes de insertar (reemplazo)', /\.delete\(\)[\s\S]{0,600}\.insert\(/.test(CLOUD_SRC), true);
 
-check('ui: baja el dia al abrir', /loadMealsForDate\(fechaHoy\)/.test(COMP_SRC), true);
-check('ui: escribe la cache local', /localStorage\.setItem\(claveCache\(fechaHoy\)/.test(COMP_SRC), true);
+check('ui: baja el dia al abrir', /loadMealsForDate\(fechaActiva\)/.test(COMP_SRC), true);
+check('ui: escribe la cache local', /localStorage\.setItem\(claveCache\(fecha\)/.test(COMP_SRC), true);
 check('ui: persiste al agregar', /persistir\(siguiente, mealType\);[\s\S]*?persistir\(siguiente, mealType\);/.test(COMP_SRC), true);
 check('ui: persiste al cambiar gramos, al borrar y al agregar un plato', (COMP_SRC.match(/persistir\(siguiente, mealType\);/g) || []).length, 4);
 check('ui: el plato tambien persiste', /addPlatoToMeal[\s\S]{0,900}?persistir\(siguiente, mealType\);/.test(COMP_SRC), true);
