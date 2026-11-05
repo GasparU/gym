@@ -28,11 +28,12 @@ const platos = data.platos ?? [];
 const porNombre = new Map(foods.map((f) => [f.nombre, f]));
 
 // ---- Estructura ----
-check('cantidad de platos', platos.length, 8);
+check('cantidad de platos', platos.length, 23);
 check('ids unicos', new Set(platos.map((p) => p.id)).size, platos.length);
 check('nombres unicos', new Set(platos.map((p) => p.nombre)).size, platos.length);
 check('todos tienen grupo valido', platos.every((p) => GRUPOS_PLATO.includes(p.grupo)), true);
 check('todos tienen al menos 5 ingredientes', platos.every((p) => p.ingredientes.length >= 5), true);
+check('hay 15 sopas', platos.filter((p) => p.grupo === 'Sopas').length, 15);
 check(
   'gramos positivos',
   platos.every((p) => p.ingredientes.every((i) => Number.isFinite(i.gramos) && i.gramos > 0)),
@@ -85,6 +86,21 @@ const GOLD = {
   carapulcra: { kcal: 563.1, p: 35.2, g: 252 },
   chanfainita: { kcal: 466.7, p: 33.3, g: 460 },
   ocopa: { kcal: 480.5, p: 14.2, g: 300 },
+  'aguadito-de-pollo': { kcal: 647.7, p: 34.7, g: 561 },
+  'sopa-de-pollo-con-fideos': { kcal: 562.3, p: 32.8, g: 523 },
+  'sopa-de-semola-con-pollo': { kcal: 564.8, p: 27.7, g: 491 },
+  'sopa-de-lentejas': { kcal: 327.3, p: 16.7, g: 421 },
+  menestron: { kcal: 585.2, p: 36.9, g: 540 },
+  'caldo-de-gallina': { kcal: 611.4, p: 37.7, g: 523 },
+  'sopa-a-la-minuta': { kcal: 508.8, p: 34.4, g: 512 },
+  'sopa-de-sustancia': { kcal: 458.5, p: 34.5, g: 536 },
+  'sopa-de-quinua': { kcal: 444.5, p: 16.8, g: 428 },
+  'sopa-de-moron': { kcal: 370.4, p: 24.6, g: 461 },
+  'sopa-de-verduras': { kcal: 384.0, p: 11.5, g: 500 },
+  'sopa-de-albondigas': { kcal: 376.1, p: 31.4, g: 512 },
+  'chupe-de-pescado': { kcal: 556.7, p: 45.8, g: 602 },
+  'sopa-de-zapallo': { kcal: 341.2, p: 11.2, g: 515 },
+  'sopa-de-arvejas': { kcal: 481.6, p: 25.8, g: 530 },
 };
 for (const p of platos) {
   const calc = calcularPlato(p, {}, foods, 1);
@@ -101,6 +117,10 @@ checkCerca('seco con frejol', calcularPlato(seco, { opciones: { guarnicion: 'fre
 const carapulcra = platos.find((p) => p.id === 'carapulcra');
 checkCerca('carapulcra con pollo', calcularPlato(carapulcra, { opciones: { carne: 'pollo' } }, foods, 1).totales.kcal, 534.3);
 checkCerca('chaufa + hot dog', calcularPlato(chaufa, { extras: ['hotdog'] }, foods, 1).totales.kcal, 780.5);
+const chupe = platos.find((p) => p.id === 'chupe-de-pescado');
+checkCerca('chupe con merluza', calcularPlato(chupe, { opciones: { pescado: 'merluza' } }, foods, 1).totales.kcal, 470.9);
+const aguadito = platos.find((p) => p.id === 'aguadito-de-pollo');
+checkCerca('aguadito + mas arroz', calcularPlato(aguadito, { extras: ['mas-arroz'] }, foods, 1).totales.kcal, 719.3);
 
 // ---- Escalado por factor ----
 const arroz = platos.find((p) => p.id === 'arroz-con-pollo');

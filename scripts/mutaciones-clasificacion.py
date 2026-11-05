@@ -47,7 +47,11 @@ MUTS = [
      "  const acotado = Math.min(max, Math.max(min, crudo));",
      "  const acotado = 1;"),
         ("M13 el modal no agrega el plato", "src/components/DietModule.tsx",
-         "addPlatoToMeal(platoAbierto.mealType, plato, calc);", "void 0;"),
+         "addPlatoToMeal(mealType, plato, calc);", "void 0;"),
+        ("M14 el recetario pierde el titulo", "src/components/DietModule.tsx",
+         "🍲 Recetario criollo", "🍲 Recetas"),
+        ("M15 el modal no deja elegir la comida", "src/components/PlatoModal.tsx",
+         "¿A qué comida lo sumás?", "Comida"),
 ]
 
 

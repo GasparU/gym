@@ -235,26 +235,38 @@ fuente de verdad.
   la receta lleva una **observacion visible** ("no esta en la tabla: pesalo aparte, 1 cda de mayonesa
   ~90 kcal") y ese ingrediente **NO** entra al total calculado. **Regla: nunca inventar el valor.**
 
-## Recetario de platos (Bloque 1: 8 platos) — 05/11/2026
+## Recetario de platos (23 platos: 8 criollos + 15 sopas) — 05/11/2026
 
 - **Modelo**: `public/data/platos.json` = recetas con **gramos POR PORCION**. Los valores NO se guardan:
   se calculan desde `foods.json` por **NOMBRE exacto** (`src/logic/platos.ts`, nucleo PURO).
-- **UI**: cada comida tiene el toggle **Alimento | Plato criollo**. El plato abre `PlatoModal`
-  (ingredientes, gramos, kcal, opciones, extras y observaciones), sugiere la porcion con
-  `factorParaPresupuesto` (**piso 0,5 / techo 1,5**) y al agregar crea **UNA fila** con `foodId: -1`.
-  Como el nombre del plato no existe en `foods.json`, `normalizarEntradas` la deja intacta: **la fila
-  sobrevive al refresh y a la nube**.
-- **Variantes**: `opciones` (sustitucion: seco **con papa | con frejol**; carapulcra **con cerdo | con
-  pollo**) y `extras` (**+ huevo, + arroz, + hot dog**).
-- **Ingredientes que NO estan en la tabla** van en `observaciones` con su `aproxKcal` (hoy: **sillao
-  5 kcal** en el chaufa). **Nunca entran al total**: el modal avisa "pesalo aparte".
-- **Valores dorados congelados** en `scripts/verify-platos.mjs` (**60 aserciones**), medidos contra la
-  tabla: arroz con pollo **536,5** · aji de gallina **625,2** · chaufa **598,5** · seco con papa **526,3**
-  (con frejol **706,3**) · pollo al mani **594,6** · carapulcra con cerdo **563,1** (con pollo **534,3**) ·
-  chanfainita **466,7** · ocopa **480,5**.
-- **Gates**: `npm run verify` (metabolismo + alimentos + platos + cableado + dieta) y
+- **UI (2 puertas, las dos visibles)**:
+  1. **Tarjeta "🍲 Recetario criollo" ARRIBA de las comidas** (siempre a la vista, con el contador de platos).
+     Al elegir un plato toma como inicio la **comida segun la hora** (`comidaPorHora`).
+  2. **Toggle `Alimento | Plato criollo` dentro de cada comida** (botones grandes, ya no grises de 11 px).
+- **`PlatoModal`**: ingredientes con gramos y kcal, opciones, extras, observaciones y un **selector de
+  comida** (`¿A qué comida lo sumás?`): se puede mandar el plato a otra comida sin cerrar.
+  Sugiere la porcion con `factorParaPresupuesto` (**piso 0,5 / techo 1,5**).
+- **Persistencia**: el plato se agrega como **UNA fila** con `foodId: -1`. Como su nombre no existe en
+  `foods.json`, `normalizarEntradas` la deja intacta: **sobrevive al refresh y a la nube**.
+- **Variantes**: `opciones` (seco **con papa | con frejol**; carapulcra **con cerdo | con pollo**; chupe
+  **bonito | merluza**) y `extras` (**+ huevo, + arroz, + hot dog, + chancho, + mas arroz**).
+- **Ingredientes que NO estan en la tabla** van en `observaciones` con su `aproxKcal` (sillao 5 kcal,
+  kion 2 kcal, pan molido 28 kcal, sal 0). **Nunca entran al total**: el modal avisa "pesalo aparte".
+  **Si existen** (verificado, corrige una afirmacion previa): `Trigo, harina fortificada con hierro de`,
+  `Trigo, sémola de`, `Quinua`, `Cebada perlada o resbalada cruda`, `Pescado bonito`, `Pescado merluza,
+  fresco`, `Gallina, pierna de (sin piel)`, `Caldo de res*`, `Caldo de pollo, o gallina*`.
+- **El caldo de la tabla trae grasa** (89 kcal/100 g): la nota de cada sopa avisa que si se desgrasa
+  resta ~150 kcal. **No se descuenta solo.**
+- **Valores dorados congelados** en `scripts/verify-platos.mjs` (**125 aserciones**) — 23 platos base y
+  sus variantes. Sopas: aguadito 647,7 · pollo con fideos 562,3 · sémola 564,8 · lentejas 327,3 ·
+  menestrón 585,2 · caldo de gallina 611,4 · minuta 508,8 · sustancia 458,5 · quinua 444,5 ·
+  morón 370,4 · verduras 384,0 · albóndigas 376,1 · chupe 556,7 (merluza 470,9) · zapallo 341,2 ·
+  arvejas 481,6.
+- **Gates**: `npm run verify` (metabolismo · alimentos · platos · cableado · dieta) y
   `npm run verify:types` (`tsc -p tsconfig.check.json`, excluye `backups/`).
-  Mutaciones `scripts/mutaciones-clasificacion.py`: **13/13 ROJAS** (gramos, observacion, factor,
-  cableado del modal).
-- **Pendiente declarado**: **52 platos mas** (60 en total), misma estructura. Los ingredientes sin dato
-  (mayonesa, vinagre, harina de trigo) se declaran como observacion, igual que el sillao.
+  Mutaciones `scripts/mutaciones-clasificacion.py`: **15/15 ROJAS** (gramos, observacion, factor,
+  cableado del modal, titulo del recetario, selector de comida).
+- **Pendiente declarado**: **37 platos mas** (60 en total): carnes/pollos (pollada, brasa, chicharrón de
+  pollo, lomo saltado, anticuchos...), entradas (huancaína, causa, ensalada rusa), arroces y pescados.
+  **No existen en la tabla y hay que declararlos**: mayonesa, vinagre, sillao, kion, mote, ají panca en
+  pasta (si existe en polvo).

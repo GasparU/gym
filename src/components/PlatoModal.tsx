@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import type { FoodItem } from '../types/nutrition';
+import type { FoodItem, MealType } from '../types/nutrition';
 import {
   calcularPlato,
   factorParaPresupuesto,
@@ -14,18 +14,21 @@ interface PlatoModalProps {
   plato: Plato;
   foods: FoodItem[];
   kcalRestantes: number;
+  mealTypeInicial: MealType;
   onCerrar: () => void;
-  onAgregar: (plato: Plato, calculado: PlatoCalculado, factor: number, seleccion: SeleccionPlato) => void;
+  onAgregar: (plato: Plato, calculado: PlatoCalculado, mealType: MealType) => void;
 }
 
 export const PlatoModal: React.FC<PlatoModalProps> = ({
   plato,
   foods,
   kcalRestantes,
+  mealTypeInicial,
   onCerrar,
   onAgregar,
 }) => {
   const [extras, setExtras] = useState<string[]>([]);
+  const [comida, setComida] = useState<MealType>(mealTypeInicial);
   const [opciones, setOpciones] = useState<Record<string, string>>(() => {
     const inicial: Record<string, string> = {};
     for (const o of plato.opciones ?? []) inicial[o.id] = o.porDefecto;
@@ -78,6 +81,28 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
 
         <div className="space-y-4 px-4 py-3">
           {plato.nota && <p className="text-[11px] leading-snug text-slate-400">{plato.nota}</p>}
+
+          {/* A que comida va */}
+          <div>
+            <p className="mb-1 text-[11px] font-semibold text-slate-300">¿A qué comida lo sumás?</p>
+            <div className="flex gap-1.5">
+              {(['desayuno', 'almuerzo', 'cena'] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setComida(m)}
+                  aria-pressed={comida === m}
+                  className={`flex-1 rounded-lg border px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${
+                    comida === m
+                      ? 'border-brand-500 bg-brand-500/20 text-brand-300'
+                      : 'border-slate-700 text-slate-400 hover:border-slate-500'
+                  }`}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Opciones (sustituciones) */}
           {(plato.opciones ?? []).map((opcion) => (
@@ -196,10 +221,10 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
         <div className="sticky bottom-0 border-t border-slate-700 bg-slate-900/95 px-4 py-3">
           <button
             type="button"
-            onClick={() => onAgregar(plato, calc, factor, seleccion)}
+            onClick={() => onAgregar(plato, calc, comida)}
             className="w-full rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
           >
-            Agregar {textoPorcion(factor)} · {numEs(calc.totales.kcal)} kcal
+            Agregar a {comida} · {textoPorcion(factor)} · {numEs(calc.totales.kcal)} kcal
           </button>
         </div>
       </div>

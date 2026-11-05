@@ -1,7 +1,7 @@
 {
   "version": 1,
   "actualizado": "2026-11-05",
-  "nota": "Gramos POR PORCION (1 plato servido). Los valores nutricionales NO se guardan aca: se calculan desde foods.json por NOMBRE exacto.",
+  "nota": "Gramos POR PORCION. Los valores NO se guardan: se calculan desde foods.json por nombre exacto.",
   "platos": [
     {
       "id": "arroz-con-pollo",
@@ -20,8 +20,20 @@
         { "nombre": "Ajo sin cáscara", "gramos": 5 }
       ],
       "extras": [
-        { "id": "huevo", "etiqueta": "+ Huevo duro", "ingredientes": [{ "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }] },
-        { "id": "papa", "etiqueta": "+ Papa sancochada", "ingredientes": [{ "nombre": "Papa blanca", "gramos": 100 }] }
+        {
+          "id": "huevo",
+          "etiqueta": "+ Huevo duro",
+          "ingredientes": [
+            { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }
+          ]
+        },
+        {
+          "id": "papa",
+          "etiqueta": "+ Papa sancochada",
+          "ingredientes": [
+            { "nombre": "Papa blanca", "gramos": 100 }
+          ]
+        }
       ],
       "opciones": [],
       "observaciones": []
@@ -43,8 +55,20 @@
         { "nombre": "Queso fresco de vaca", "gramos": 10 }
       ],
       "extras": [
-        { "id": "huevo", "etiqueta": "+ Huevo duro", "ingredientes": [{ "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }] },
-        { "id": "arroz", "etiqueta": "+ Arroz blanco", "ingredientes": [{ "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }] }
+        {
+          "id": "huevo",
+          "etiqueta": "+ Huevo duro",
+          "ingredientes": [
+            { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }
+          ]
+        },
+        {
+          "id": "arroz",
+          "etiqueta": "+ Arroz blanco",
+          "ingredientes": [
+            { "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }
+          ]
+        }
       ],
       "opciones": [],
       "observaciones": []
@@ -63,12 +87,28 @@
         { "nombre": "Pimiento rojo", "gramos": 20 }
       ],
       "extras": [
-        { "id": "hotdog", "etiqueta": "+ Hot dog", "ingredientes": [{ "nombre": "Hot Dog", "gramos": 50 }] },
-        { "id": "chancho", "etiqueta": "+ Chancho", "ingredientes": [{ "nombre": "Cerdo, carne magra, cruda*", "gramos": 60 }] }
+        {
+          "id": "hotdog",
+          "etiqueta": "+ Hot dog",
+          "ingredientes": [
+            { "nombre": "Hot Dog", "gramos": 50 }
+          ]
+        },
+        {
+          "id": "chancho",
+          "etiqueta": "+ Chancho",
+          "ingredientes": [
+            { "nombre": "Cerdo, carne magra, cruda*", "gramos": 60 }
+          ]
+        }
       ],
       "opciones": [],
       "observaciones": [
-        { "ingrediente": "Sillao (salsa de soya)", "detalle": "No esta en la tabla peruana. Pesa lo que le pusiste y sumalo aparte.", "aproxKcal": 5 }
+        {
+          "ingrediente": "Sillao (salsa de soya)",
+          "detalle": "No esta en la tabla peruana. Pesa lo que le pusiste y sumalo aparte.",
+          "aproxKcal": 5
+        }
       ]
     },
     {
@@ -85,7 +125,13 @@
         { "nombre": "Arveja verde partida sancochada", "gramos": 30 }
       ],
       "extras": [
-        { "id": "arroz", "etiqueta": "+ Arroz blanco", "ingredientes": [{ "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }] }
+        {
+          "id": "arroz",
+          "etiqueta": "+ Arroz blanco",
+          "ingredientes": [
+            { "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }
+          ]
+        }
       ],
       "opciones": [
         {
@@ -93,8 +139,20 @@
           "etiqueta": "Guarnicion",
           "porDefecto": "papa",
           "alternativas": [
-            { "id": "papa", "etiqueta": "Con papa", "ingredientes": [{ "nombre": "Papa blanca", "gramos": 200 }] },
-            { "id": "frejol", "etiqueta": "Con frejol", "ingredientes": [{ "nombre": "Frejol canario", "gramos": 150 }] }
+            {
+              "id": "papa",
+              "etiqueta": "Con papa",
+              "ingredientes": [
+                { "nombre": "Papa blanca", "gramos": 200 }
+              ]
+            },
+            {
+              "id": "frejol",
+              "etiqueta": "Con frejol",
+              "ingredientes": [
+                { "nombre": "Frejol canario", "gramos": 150 }
+              ]
+            }
           ]
         }
       ],
@@ -115,7 +173,13 @@
         { "nombre": "Leche evaporada entera", "gramos": 20 }
       ],
       "extras": [
-        { "id": "arroz", "etiqueta": "+ Arroz blanco", "ingredientes": [{ "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }] }
+        {
+          "id": "arroz",
+          "etiqueta": "+ Arroz blanco",
+          "ingredientes": [
+            { "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }
+          ]
+        }
       ],
       "opciones": [],
       "observaciones": []
@@ -135,7 +199,13 @@
         { "nombre": "Cominos", "gramos": 2 }
       ],
       "extras": [
-        { "id": "arroz", "etiqueta": "+ Arroz blanco", "ingredientes": [{ "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }] }
+        {
+          "id": "arroz",
+          "etiqueta": "+ Arroz blanco",
+          "ingredientes": [
+            { "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }
+          ]
+        }
       ],
       "opciones": [
         {
@@ -143,8 +213,20 @@
           "etiqueta": "Carne",
           "porDefecto": "cerdo",
           "alternativas": [
-            { "id": "cerdo", "etiqueta": "Con cerdo", "ingredientes": [{ "nombre": "Cerdo, carne magra, cruda*", "gramos": 120 }] },
-            { "id": "pollo", "etiqueta": "Con pollo", "ingredientes": [{ "nombre": "Pollo, carne pulpa", "gramos": 120 }] }
+            {
+              "id": "cerdo",
+              "etiqueta": "Con cerdo",
+              "ingredientes": [
+                { "nombre": "Cerdo, carne magra, cruda*", "gramos": 120 }
+              ]
+            },
+            {
+              "id": "pollo",
+              "etiqueta": "Con pollo",
+              "ingredientes": [
+                { "nombre": "Pollo, carne pulpa", "gramos": 120 }
+              ]
+            }
           ]
         }
       ],
@@ -165,7 +247,13 @@
         { "nombre": "Cominos", "gramos": 2 }
       ],
       "extras": [
-        { "id": "arroz", "etiqueta": "+ Arroz blanco", "ingredientes": [{ "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }] }
+        {
+          "id": "arroz",
+          "etiqueta": "+ Arroz blanco",
+          "ingredientes": [
+            { "nombre": "Arroz pilado o pulido cocido", "gramos": 100 }
+          ]
+        }
       ],
       "opciones": [],
       "observaciones": []
@@ -186,11 +274,352 @@
         { "nombre": "Queso fresco de vaca", "gramos": 10 }
       ],
       "extras": [
-        { "id": "huevo", "etiqueta": "+ Huevo duro", "ingredientes": [{ "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }] },
-        { "id": "aceituna", "etiqueta": "+ Aceituna", "ingredientes": [{ "nombre": "Aceituna de botija", "gramos": 15 }] }
+        {
+          "id": "huevo",
+          "etiqueta": "+ Huevo duro",
+          "ingredientes": [
+            { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }
+          ]
+        },
+        {
+          "id": "aceituna",
+          "etiqueta": "+ Aceituna",
+          "ingredientes": [
+            { "nombre": "Aceituna de botija", "gramos": 15 }
+          ]
+        }
       ],
       "opciones": [],
       "observaciones": []
+    },
+    {
+      "id": "aguadito-de-pollo",
+      "nombre": "Aguadito de pollo",
+      "grupo": "Sopas",
+      "nota": "Arroz crudo en el caldo: por eso rinde mas. El culantro va al final para que no pierda color. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 120 },
+        { "nombre": "Arroz blanco corriente", "gramos": 40 },
+        { "nombre": "Papa amarilla sin cáscara", "gramos": 80 },
+        { "nombre": "Zanahoria", "gramos": 30 },
+        { "nombre": "Arveja, fresca sin vaina", "gramos": 30 },
+        { "nombre": "Culantro sin tallo", "gramos": 20 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 },
+        { "nombre": "Pimienta negra", "gramos": 1 }
+      ],
+      "extras": [
+        {
+          "id": "mas-arroz",
+          "etiqueta": "+ mas arroz",
+          "ingredientes": [
+            { "nombre": "Arroz blanco corriente", "gramos": 20 }
+          ]
+        }
+      ],
+      "observaciones": [
+        {
+          "ingrediente": "Sal",
+          "detalle": "La tabla no tiene sal. No aporta calorias: usa la que necesites.",
+          "aproxKcal": 0
+        }
+      ]
+    },
+    {
+      "id": "sopa-de-pollo-con-fideos",
+      "nombre": "Sopa de pollo con fideos",
+      "grupo": "Sopas",
+      "nota": "La de casa de todos los domingos. Con pechuga baja la grasa; con pierna queda mas sabrosa. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Pollo, carne pulpa", "gramos": 120 },
+        { "nombre": "Fideo tallarín crudo fortificado con hierro", "gramos": 40 },
+        { "nombre": "Papa blanca", "gramos": 80 },
+        { "nombre": "Zanahoria", "gramos": 30 },
+        { "nombre": "Apio, tallo sin hojas", "gramos": 20 },
+        { "nombre": "Cebolla de cabeza", "gramos": 25 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 3 },
+        { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 }
+      ],
+      "observaciones": [
+        {
+          "ingrediente": "Kion (jengibre)",
+          "detalle": "No esta en la tabla. Una rodaja aporta ~2 kcal.",
+          "aproxKcal": 2
+        }
+      ]
+    },
+    {
+      "id": "sopa-de-semola-con-pollo",
+      "nombre": "Sopa de semola con pollo",
+      "grupo": "Sopas",
+      "nota": "La semola es trigo molido grueso: espesa sola, no hace falta harina. Pesa la semola CRUDA. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Trigo, sémola de", "gramos": 40 },
+        { "nombre": "Pollo, carne pulpa", "gramos": 100 },
+        { "nombre": "Papa blanca", "gramos": 80 },
+        { "nombre": "Zanahoria", "gramos": 30 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 },
+        { "nombre": "Pimienta negra", "gramos": 1 }
+      ],
+      "extras": [
+        {
+          "id": "huevo",
+          "etiqueta": "+ huevo",
+          "ingredientes": [
+            { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sopa-de-lentejas",
+      "nombre": "Sopa de lentejas",
+      "grupo": "Sopas",
+      "nota": "Pesa la lenteja CRUDA (50 g) y dejala remojar: rinde casi el doble. Es la sopa con mas fibra de la lista. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Lentejas chicas", "gramos": 50 },
+        { "nombre": "Papa blanca", "gramos": 80 },
+        { "nombre": "Zanahoria", "gramos": 30 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Apio, tallo sin hojas", "gramos": 20 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Caldo de res*", "gramos": 200 },
+        { "nombre": "Pimienta negra", "gramos": 1 }
+      ]
+    },
+    {
+      "id": "menestron",
+      "nombre": "Menestron",
+      "grupo": "Sopas",
+      "nota": "Lleva fideo Y menestras: es la sopa mas completa. Todo se pesa CRUDO. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Fideo tallarín crudo fortificado con hierro", "gramos": 40 },
+        { "nombre": "Frejol bayo", "gramos": 30 },
+        { "nombre": "Garbanzo", "gramos": 25 },
+        { "nombre": "Arveja verde partida sancochada", "gramos": 30 },
+        { "nombre": "Papa blanca", "gramos": 60 },
+        { "nombre": "Res, carne pulpa de", "gramos": 70 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Albahaca sin tallo", "gramos": 5 },
+        { "nombre": "Zapallo criollo", "gramos": 40 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Caldo de res*", "gramos": 200 }
+      ]
+    },
+    {
+      "id": "caldo-de-gallina",
+      "nombre": "Caldo de gallina",
+      "grupo": "Sopas",
+      "nota": "La gallina tiene mas grasa que el pollo: por eso el caldo sale amarillo. Pesa la pierna SIN piel. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Gallina, pierna de (sin piel)", "gramos": 120 },
+        { "nombre": "Fideo tallarín crudo fortificado con hierro", "gramos": 40 },
+        { "nombre": "Papa amarilla sin cáscara", "gramos": 80 },
+        { "nombre": "Cebollita china", "gramos": 15 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 },
+        { "nombre": "Poro sin hojas", "gramos": 15 },
+        { "nombre": "Orégano fresco", "gramos": 2 },
+        { "nombre": "Pimienta negra", "gramos": 1 },
+        { "nombre": "Caldo de pollo, o gallina*", "gramos": 200 }
+      ],
+      "observaciones": [
+        {
+          "ingrediente": "Kion (jengibre)",
+          "detalle": "No esta en la tabla. Una rodaja aporta ~2 kcal.",
+          "aproxKcal": 2
+        }
+      ]
+    },
+    {
+      "id": "sopa-a-la-minuta",
+      "nombre": "Sopa a la minuta",
+      "grupo": "Sopas",
+      "nota": "La leche evaporada es la que la hace cremosa. Si le pones menos, baja ~40 kcal por porcion. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Res, carne pulpa de", "gramos": 80 },
+        { "nombre": "Fideo tallarín crudo fortificado con hierro", "gramos": 40 },
+        { "nombre": "Leche evaporada entera", "gramos": 60 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 40 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Orégano fresco", "gramos": 2 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Caldo de res*", "gramos": 200 }
+      ]
+    },
+    {
+      "id": "sopa-de-sustancia",
+      "nombre": "Sopa de sustancia",
+      "grupo": "Sopas",
+      "nota": "La sopa de res de casa. El huevo va entero al final; si lo bates se reparte distinto pero suma igual. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Res, carne pulpa de", "gramos": 90 },
+        { "nombre": "Fideo tallarín crudo fortificado con hierro", "gramos": 40 },
+        { "nombre": "Papa blanca", "gramos": 80 },
+        { "nombre": "Zanahoria", "gramos": 30 },
+        { "nombre": "Cebolla de cabeza", "gramos": 25 },
+        { "nombre": "Apio, tallo sin hojas", "gramos": 20 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 },
+        { "nombre": "Pimienta negra", "gramos": 1 },
+        { "nombre": "Caldo de res*", "gramos": 200 }
+      ]
+    },
+    {
+      "id": "sopa-de-quinua",
+      "nombre": "Sopa de quinua",
+      "grupo": "Sopas",
+      "nota": "La quinua se lava antes (sale la espuma). Pesa la quinua CRUDA y enjuagala hasta que no espume. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Quinua", "gramos": 45 },
+        { "nombre": "Papa blanca", "gramos": 60 },
+        { "nombre": "Zanahoria", "gramos": 30 },
+        { "nombre": "Cebolla de cabeza", "gramos": 25 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Leche evaporada entera", "gramos": 40 },
+        { "nombre": "Queso fresco de vaca", "gramos": 20 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 3 },
+        { "nombre": "Caldo de res*", "gramos": 200 }
+      ]
+    },
+    {
+      "id": "sopa-de-moron",
+      "nombre": "Sopa de moron (cebada)",
+      "grupo": "Sopas",
+      "nota": "El 'moron' peruano es la cebada pelada. Pesa la cebada CRUDA: triplica su peso al cocinarse. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Cebada perlada o resbalada cruda", "gramos": 45 },
+        { "nombre": "Res, carne pulpa de", "gramos": 80 },
+        { "nombre": "Papa blanca", "gramos": 60 },
+        { "nombre": "Zanahoria", "gramos": 30 },
+        { "nombre": "Cebolla de cabeza", "gramos": 25 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Poro sin hojas", "gramos": 15 },
+        { "nombre": "Pimienta negra", "gramos": 1 },
+        { "nombre": "Caldo de res*", "gramos": 200 }
+      ]
+    },
+    {
+      "id": "sopa-de-verduras",
+      "nombre": "Sopa de verduras",
+      "grupo": "Sopas",
+      "nota": "La mas liviana de la lista y la que mas llena por volumen. Sirve para 'tapar el hambre' sin gastar kcal. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Papa blanca", "gramos": 80 },
+        { "nombre": "Zanahoria", "gramos": 40 },
+        { "nombre": "Arveja, fresca sin vaina", "gramos": 30 },
+        { "nombre": "Maíz, grano fresco (choclo)", "gramos": 40 },
+        { "nombre": "Zapallo criollo", "gramos": 50 },
+        { "nombre": "Fideo tallarín crudo fortificado con hierro", "gramos": 30 },
+        { "nombre": "Cebolla de cabeza", "gramos": 25 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Caldo de res*", "gramos": 200 }
+      ]
+    },
+    {
+      "id": "sopa-de-albondigas",
+      "nombre": "Sopa de albondigas",
+      "grupo": "Sopas",
+      "nota": "La albondiga lleva huevo y harina como ligador. Pesa la carne CRUDA antes de formar las bolas. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Res, carne pulpa de", "gramos": 100 },
+        { "nombre": "Huevo de gallina entero, crudo", "gramos": 25 },
+        { "nombre": "Trigo, harina fortificada con hierro de", "gramos": 15 },
+        { "nombre": "Papa blanca", "gramos": 80 },
+        { "nombre": "Zanahoria", "gramos": 30 },
+        { "nombre": "Cebolla de cabeza", "gramos": 25 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 30 },
+        { "nombre": "Orégano fresco", "gramos": 2 },
+        { "nombre": "Caldo de res*", "gramos": 200 }
+      ],
+      "observaciones": [
+        {
+          "ingrediente": "Pan molido",
+          "detalle": "No esta en la tabla. Si lo usas, 10 g de pan son ~28 kcal (busca 'Pan campesino de Lima').",
+          "aproxKcal": 28
+        }
+      ]
+    },
+    {
+      "id": "chupe-de-pescado",
+      "nombre": "Chupe de pescado",
+      "grupo": "Sopas",
+      "nota": "El chupe lleva leche y huevo: es una sopa espesa. Con merluza baja mucho la grasa; con bonito queda mas fuerte. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Papa blanca", "gramos": 100 },
+        { "nombre": "Leche evaporada entera", "gramos": 60 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 },
+        { "nombre": "Cebolla de cabeza", "gramos": 40 },
+        { "nombre": "Tomate redondo, con cáscara", "gramos": 50 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 15 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Orégano fresco", "gramos": 2 },
+        { "nombre": "Caldo de res*", "gramos": 150 }
+      ],
+      "opciones": [
+        {
+          "id": "pescado",
+          "etiqueta": "Pescado",
+          "porDefecto": "bonito",
+          "alternativas": [
+            {
+              "id": "bonito",
+              "etiqueta": "Bonito",
+              "ingredientes": [
+                { "nombre": "Pescado bonito", "gramos": 130 }
+              ]
+            },
+            {
+              "id": "merluza",
+              "etiqueta": "Merluza (mas liviana)",
+              "ingredientes": [
+                { "nombre": "Pescado merluza, fresco", "gramos": 130 }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sopa-de-zapallo",
+      "nombre": "Sopa de zapallo",
+      "grupo": "Sopas",
+      "nota": "Con zapallo criollo sale dulce y espesa sin harina. Si la licuas rinde mas y llena igual. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Zapallo criollo", "gramos": 200 },
+        { "nombre": "Papa blanca", "gramos": 50 },
+        { "nombre": "Leche evaporada entera", "gramos": 60 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Queso fresco de vaca", "gramos": 15 },
+        { "nombre": "Caldo de res*", "gramos": 150 }
+      ]
+    },
+    {
+      "id": "sopa-de-arvejas",
+      "nombre": "Sopa de arvejas",
+      "grupo": "Sopas",
+      "nota": "Con arveja partida seca sale espesa; con arveja fresca queda mas ligera. La de la tabla es SANCOCHADA. El caldo de la tabla ya trae grasa: si lo desgrasas, resta ~150 kcal.",
+      "ingredientes": [
+        { "nombre": "Arveja verde partida sancochada", "gramos": 120 },
+        { "nombre": "Papa blanca", "gramos": 80 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 5 },
+        { "nombre": "Huevo de gallina entero, sancochado en agua", "gramos": 50 },
+        { "nombre": "Leche evaporada entera", "gramos": 40 },
+        { "nombre": "Caldo de res*", "gramos": 200 }
+      ]
     }
   ]
 }

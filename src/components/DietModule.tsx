@@ -138,6 +138,14 @@ function cargarPerfil(): UserProfile {
   }
 }
 
+/** Comida sugerida segun la hora local. Es solo el valor inicial: el modal lo deja cambiar. */
+const comidaPorHora = (): MealType => {
+  const h = new Date().getHours();
+  if (h < 11) return "desayuno";
+  if (h < 16) return "almuerzo";
+  return "cena";
+};
+
 export const DietModule: React.FC = () => {
   const [foods, setFoods] = useState<FoodItem[]>([]);
   const [platos, setPlatos] = useState<Plato[]>([]);
@@ -603,6 +611,24 @@ export const DietModule: React.FC = () => {
           />
         </div>
       </div>
+          {/* 3.5 Recetario: siempre a la vista */}
+          <div className="bg-slate-800/80 border border-brand-500/40 rounded-xl p-4 space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <h4 className="text-base font-semibold text-slate-100">🍲 Recetario criollo</h4>
+              <span className="text-[11px] text-slate-400">
+                {platos.length} platos caseros
+              </span>
+            </div>
+            <p className="text-[11px] leading-snug text-slate-400">
+              Buscá el plato, mirá los gramos y la receta se ajusta a lo que te queda hoy. Lo que no
+              está en la tabla (sillao, sal, kion) se avisa y no entra al total.
+            </p>
+            <BuscadorPlato
+              platos={platos}
+              onElegir={(plato) => setPlatoAbierto({ plato, mealType: comidaPorHora() })}
+            />
+          </div>
+
       {/* 4. Tablas por Comida */}
       {(["desayuno", "almuerzo", "cena"] as MealType[]).map((mealType) => (
         <div
@@ -621,17 +647,17 @@ export const DietModule: React.FC = () => {
             </span>
           </div>
 
-              <div className="flex gap-1.5">
+              <div className="flex gap-2">
                 {(["alimento", "plato"] as const).map((m) => (
                   <button
                     key={m}
                     type="button"
                     onClick={() => setModo((prev) => ({ ...prev, [mealType]: m }))}
                     aria-pressed={(modo[mealType] ?? "alimento") === m}
-                    className={`rounded-full border px-3 py-1 text-[11px] font-semibold transition-colors ${
+                    className={`rounded-full border px-4 py-2 text-xs font-semibold transition-colors ${
                       (modo[mealType] ?? "alimento") === m
                         ? "border-brand-500 bg-brand-500/20 text-brand-300"
-                        : "border-slate-700 text-slate-400 hover:border-slate-500"
+                        : "border-slate-600 bg-slate-900/40 text-slate-200 hover:border-slate-400"
                     }`}
                   >
                     {m === "alimento" ? "Alimento" : "Plato criollo"}
@@ -733,9 +759,10 @@ export const DietModule: React.FC = () => {
           plato={platoAbierto.plato}
           foods={foods}
           kcalRestantes={targets.metaCalorica - totalAudit.energiaTablaKcal}
+          mealTypeInicial={platoAbierto.mealType}
           onCerrar={() => setPlatoAbierto(null)}
-          onAgregar={(plato, calc) => {
-            addPlatoToMeal(platoAbierto.mealType, plato, calc);
+          onAgregar={(plato, calc, mealType) => {
+            addPlatoToMeal(mealType, plato, calc);
             setPlatoAbierto(null);
           }}
         />
