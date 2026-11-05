@@ -31,7 +31,7 @@ const platos = data.platos ?? [];
 const porNombre = new Map(foods.map((f) => [f.nombre, f]));
 
 // ---- Estructura ----
-check('cantidad de platos', platos.length, 60);
+check('cantidad de platos', platos.length, 61);
 check('ids unicos', new Set(platos.map((p) => p.id)).size, platos.length);
 check('nombres unicos', new Set(platos.map((p) => p.nombre)).size, platos.length);
 check('todos tienen grupo valido', platos.every((p) => GRUPOS_PLATO.includes(p.grupo)), true);
@@ -138,6 +138,7 @@ const GOLD = {
   'locro-de-zapallo': { kcal: 395, p: 12, g: 470 },
   'estofado-de-pollo': { kcal: 686.5, p: 51.9, g: 680 },
   'adobo-de-chancho': { kcal: 604.4, p: 42.7, g: 375 },
+  'quinua-saltada-con-pollo': { kcal: 494.8, p: 37.9, g: 490 },
   'pescado-frito-con-arroz': { kcal: 817, p: 76.2, g: 540 },
   'sudado-de-pescado': { kcal: 473.1, p: 47.1, g: 515 },
   'chicharron-de-pescado': { kcal: 655.6, p: 48.2, g: 400 },
@@ -151,7 +152,35 @@ for (const p of platos) {
   check(`${p.id} sin faltantes`, calc.faltantes, []);
 }
 
-// ---- Variantes cambian el total ----
+    // ---- El UNICO segundo con quinua (pedido del dueno, 05/11/2026) ----
+    // Sin esto, el buscador no lo ofrece y nadie se entera de que existe.
+    const quinua = platos.find((p) => p.id === 'quinua-saltada-con-pollo');
+    check('existe el segundo de quinua', !!quinua, true);
+    check('el segundo de quinua es un SEGUNDO', quinua?.grupo, 'Guisos y segundos');
+    check(
+      'el segundo de quinua declara la quinua COCIDA',
+      /cocida/i.test(quinua?.nota ?? ''),
+      true,
+    );
+    check(
+      'hay un solo plato con quinua como segundo',
+      platos.filter((p) => p.grupo !== 'Sopas' && /quinua/i.test(p.nombre)).map((p) => p.id),
+      ['quinua-saltada-con-pollo'],
+    );
+
+    // ---- Buscador: NUNCA puede cortar la lista (pedido del dueno, 05/11/2026) ----
+    // "pongo quinua y solo sale sopa de quinua": el buscador ya no limita resultados, pero
+    // se congela aca para que nadie meta un `.slice(0, N)` sin darse cuenta.
+    const buscador = fs.readFileSync('src/components/BuscadorPlato.tsx', 'utf8');
+    const diet = fs.readFileSync('src/components/DietModule.tsx', 'utf8');
+    check('el buscador no corta la lista', /\.slice\(/.test(buscador), false);
+    check('el buscador dibuja la lista completa', /lista\.map\(/.test(buscador), true);
+    check('el buscador no hide ningun grupo', /p\.grupo\s*===/.test(buscador), false);
+    check('el buscador busca por NOMBRE sin acentos', /normalize\('NFD'\)/.test(buscador), true);
+    check('el buscador avisa cuando hay que deslizar', /desliz/i.test(buscador), true);
+    check('el recetario se pide sin cache', /cache:\s*['"]no-cache['"]/.test(diet), true);
+
+    // ---- Variantes cambian el total ----
 const seco = platos.find((p) => p.id === 'seco-de-pollo');
 checkCerca('seco con frejol', calcularPlato(seco, { opciones: { guarnicion: 'frejol' } }, foods, 1).totales.kcal, 706.3);
 const carapulcra = platos.find((p) => p.id === 'carapulcra');
@@ -215,9 +244,9 @@ check('comida vacia acepta ambos', [puedeAgregarPlato('sopa', []), puedeAgregarP
 check('rolesEnComida resuelve por NOMBRE',
   rolesEnComida([{ nombre: 'Aguadito de pollo' }, { nombre: 'Lomo saltado' }, { nombre: 'huevo' }], platos),
   ['sopa', 'segundo']);
-check('hay 15 sopas y 45 segundos',
+check('hay 15 sopas y 46 segundos',
   platos.filter((p) => rolDePlato(p) === 'sopa').length + '/' + platos.filter((p) => rolDePlato(p) === 'segundo').length,
-  '15/45');
+  '15/46');
 
 console.log('=== Recetario de platos: verificacion ===');
 if (fallos.length) {

@@ -48,9 +48,10 @@ export const BuscadorPlato: React.FC<BuscadorPlatoProps> = ({ platos, onElegir }
         className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-500 transition-colors"
       />
       {abierto && (
-        <ul className="absolute z-50 left-0 right-0 mt-1.5 max-h-64 overflow-y-auto bg-slate-800 border border-slate-700 rounded-lg shadow-2xl py-1 text-sm divide-y divide-slate-700/50">
+        <ul className="absolute z-50 left-0 right-0 mt-1.5 max-h-96 overflow-y-auto bg-slate-800 border border-slate-700 rounded-lg shadow-2xl py-1 text-sm divide-y divide-slate-700/50">
           <li className="sticky top-0 z-10 bg-slate-800 px-4 py-1.5 text-[10px] font-medium text-slate-400 border-b border-slate-700">
             {lista.length} platos · recetas caseras
+            {lista.length > 8 ? " · deslizá para ver todos" : ""}
           </li>
           {lista.map((p) => (
             <li

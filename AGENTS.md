@@ -270,7 +270,7 @@ se cargan 14; un día sin datos fuera de la ventana no entra.
 
 ### Platos peruanos: decision de alcance (05/11/2026)
 
-- **60 platos** (no 40). Cada plato = **receta declarada** (ingredientes + gramos), nunca un numero
+- **61 platos** (no 40). Cada plato = **receta declarada** (ingredientes + gramos), nunca un numero
   inventado; el usuario ajusta una vez y queda su **"mi version"**.
 - **Variantes** se modelan como **extras/sustituciones** (`+ hot dog`, `con papa | con frejol`), no como
   sub-recetas.
@@ -278,9 +278,9 @@ se cargan 14; un día sin datos fuera de la ventana no entra.
   la receta lleva una **observacion visible** ("no esta en la tabla: pesalo aparte, 1 cda de mayonesa
   ~90 kcal") y ese ingrediente **NO** entra al total calculado. **Regla: nunca inventar el valor.**
 
-## Recetario de platos — **60 platos** (8 criollos + 15 sopas + 37 platos) — 05/11/2026
+## Recetario de platos — **61 platos** (8 criollos + 15 sopas + 38 platos) — 05/11/2026
 
-- **Modelo**: `public/data/platos.json` (60 platos) = recetas con **gramos POR PORCION**. Los valores
+- **Modelo**: `public/data/platos.json` (61 platos) = recetas con **gramos POR PORCION**. Los valores
   NO se guardan: se calculan desde `foods.json` por **NOMBRE exacto** (`src/logic/platos.ts`, nucleo PURO).
   **Grupos**: Arroces y fideos · Guisos y segundos · Menestras · Pollos y carnes · Entradas y
   guarniciones · Sopas · Pescados.
@@ -313,9 +313,18 @@ se cargan 14; un día sin datos fuera de la ventana no entra.
   chicharron de cerdo, palta, lechuga, limon, salchicha, chicha de jora, aji panca, galleta de soda.
 - **El caldo de la tabla trae grasa** (89 kcal/100 g): la nota de cada sopa avisa que si se desgrasa
   resta ~150 kcal. **No se descuenta solo.**
-- **Valores dorados congelados** en `scripts/verify-platos.mjs` (**287 aserciones**): 60 platos base +
-  variantes + escalado por factor + porcion por presupuesto + la regla sopa/segundo.
-- **Gates**: `npm run verify` (metabolismo 146 · alimentos 34 · platos 324 · cableado 55 · dieta 43 ·
+- **Valores dorados congelados** en `scripts/verify-platos.mjs` (**338 aserciones**): 61 platos base +
+  variantes + escalado por factor + porcion por presupuesto + la regla sopa/segundo + el buscador.
+- **El buscador NO corta la lista** (05/11/2026): no hay `.slice`, se dibuja `lista.map` completo y el
+  desplegable avisa "desliza para ver todos" cuando hay mas de 8. El recetario se pide con
+  `cache: "no-cache"` para que un plato nuevo aparezca sin que el navegador sirva el JSON viejo.
+  Gate: 5 aserciones (rojo si aparece un `.slice`, si el aviso desaparece o si vuelve el cache).
+- **El UNICO segundo con quinua** (pedido del dueno, 05/11/2026): `quinua-saltada-con-pollo`
+  ("Quinua saltada con pollo y verduras", grupo **Guisos y segundos**) = **494,8 kcal · 37,9 g proteina ·
+  490 g**, con la nota **"la quinua va COCIDA"** (pesarla cocida, no cruda). Antes solo existia la
+  **Sopa de quinua**: el buscador no ofrecia ningun segundo con quinua. Gate propio: existe + es segundo +
+  la nota avisa + **es el unico** plato de quinua fuera de Sopas (`mutaciones-platos.py`, **3/3 ROJAS**).
+- **Gates**: `npm run verify` (metabolismo 146 · alimentos 34 · platos 338 · cableado 55 · dieta 43 ·
   resumen 116) y
   `npm run verify:types` (`tsc -p tsconfig.check.json`, excluye `backups/`).
   Mutaciones `scripts/mutaciones-clasificacion.py`: **18/18 ROJAS**. El runner ahora aplica **todas** las

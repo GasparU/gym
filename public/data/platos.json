@@ -1536,6 +1536,23 @@
       ]
     },
     {
+      "id": "quinua-saltada-con-pollo",
+      "nombre": "Quinua saltada con pollo y verduras",
+      "grupo": "Guisos y segundos",
+      "nota": "Porcion de 1 plato (~490 g). La quinua va COCIDA: pesala ya cocida, no cruda.",
+      "ingredientes": [
+        { "nombre": "Quinua cocida", "gramos": 200 },
+        { "nombre": "Pollo, carne pulpa", "gramos": 130 },
+        { "nombre": "Arveja, fresca sin vaina", "gramos": 40 },
+        { "nombre": "Zanahoria", "gramos": 30 },
+        { "nombre": "Pimiento rojo", "gramos": 30 },
+        { "nombre": "Cebolla de cabeza", "gramos": 30 },
+        { "nombre": "Ajo sin cáscara", "gramos": 5 },
+        { "nombre": "Ají amarillo molido fresco sin sal", "gramos": 15 },
+        { "nombre": "Aceite vegetal de soya", "gramos": 10 }
+      ]
+    },
+    {
       "id": "adobo-de-chancho",
       "nombre": "Adobo de chancho",
       "grupo": "Guisos y segundos",

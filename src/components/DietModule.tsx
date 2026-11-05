@@ -484,7 +484,7 @@ export const DietModule: React.FC = () => {
 
   // Cargar recetario de public/data/platos.json (gramos por porcion)
   useEffect(() => {
-    fetch("/data/platos.json")
+    fetch("/data/platos.json", { cache: "no-cache" })
       .then((res) => res.json())
       .then((data: { platos: Plato[] }) => setPlatos(data.platos ?? []))
       .catch((err) => console.error("Error cargando platos.json:", err));
