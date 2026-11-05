@@ -313,7 +313,7 @@ se cargan 14; un día sin datos fuera de la ventana no entra.
   chicharron de cerdo, palta, lechuga, limon, salchicha, chicha de jora, aji panca, galleta de soda.
 - **El caldo de la tabla trae grasa** (89 kcal/100 g): la nota de cada sopa avisa que si se desgrasa
   resta ~150 kcal. **No se descuenta solo.**
-- **Valores dorados congelados** en `scripts/verify-platos.mjs` (**338 aserciones**): 61 platos base +
+- **Valores dorados congelados** en `scripts/verify-platos.mjs` (**351 aserciones**): 61 platos base +
   variantes + escalado por factor + porcion por presupuesto + la regla sopa/segundo + el buscador.
 - **El buscador NO corta la lista** (05/11/2026): no hay `.slice`, se dibuja `lista.map` completo y el
   desplegable avisa "desliza para ver todos" cuando hay mas de 8. El recetario se pide con
@@ -324,7 +324,22 @@ se cargan 14; un día sin datos fuera de la ventana no entra.
   490 g**, con la nota **"la quinua va COCIDA"** (pesarla cocida, no cruda). Antes solo existia la
   **Sopa de quinua**: el buscador no ofrecia ningun segundo con quinua. Gate propio: existe + es segundo +
   la nota avisa + **es el unico** plato de quinua fuera de Sopas (`mutaciones-platos.py`, **3/3 ROJAS**).
-- **Gates**: `npm run verify` (metabolismo 146 · alimentos 34 · platos 338 · cableado 55 · dieta 43 ·
+- **"Mi versión" y desglose: las DOS formas de cargar un plato (05/11/2026, pedido del dueño).**
+  Las dos salen del MISMO cálculo (`calcularPlato`), así que los totales coinciden al gramo:
+  1. **Fila del plato (por defecto)** — 1 fila con su `2º`/`SOPA`. En el detalle, **✏️ ajustar gramos**
+     abre un input por ingrediente ("a este plato le puse 5 g de aceite") y el total se recalcula. Los
+     gramos propios viajan en `MealEntry.ajustes` (por **NOMBRE** de ingrediente) y la fila se marca
+     **MI VERSIÓN**. Mientras se ajusta, la porción se fuerza a 1 (lo que se edita son los gramos reales);
+     "volver a la receta" borra los ajustes. Un ajuste inválido (negativo/NaN) se **IGNORA**: nunca se
+     convierte en 0, porque eso borraría comida que la persona sí comió.
+  2. **Agregar suelto** — el plato entra como **N filas** (una por ingrediente, con su `foodId` real). Los
+     totales son los mismos; lo que cambia es que el plato **deja de contar como sopa/segundo** y el resumen
+     cuenta N alimentos. El modal lo **ADVIERTE** al pie.
+  **Límite declarado:** `daily_meals` no tiene columnas para `platoId`/`ajustes`, así que "mi versión"
+  sobrevive al recargar (localStorage) pero **no** a una bajada desde la nube: los **números guardados no se
+  pierden** (van en `gramos`/`kcal`/macros), solo se pierde la capacidad de re-ajustar ese plato desde el
+  modal. Cerrarlo exige una columna `jsonb` en `daily_meals`.
+- **Gates**: `npm run verify` (metabolismo 146 · alimentos 34 · platos 351 · cableado 56 · dieta 46 ·
   resumen 116) y
   `npm run verify:types` (`tsc -p tsconfig.check.json`, excluye `backups/`).
   Mutaciones `scripts/mutaciones-clasificacion.py`: **18/18 ROJAS**. El runner ahora aplica **todas** las

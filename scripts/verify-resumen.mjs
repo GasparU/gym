@@ -220,7 +220,7 @@ check('ui: cambiar de día mueve la fecha activa', /setFechaActiva\(destino\)/.t
 check('ui: al cambiar de día se cierra el día que se deja', /void guardarResumenDe\(meals, fechaActiva\)/.test(COMP_SRC), true);
 check('ui: el cambio de fecha real salta al día nuevo', /setFechaActiva\(hoyReal\)/.test(COMP_SRC), true);
 check('ui: el día pasado arranca en solo lectura', /const soloLectura = !esHoy && !editandoPasado/.test(COMP_SRC), true);
-check('ui: 4 acciones bloqueadas en solo lectura', (COMP_SRC.match(/if \(soloLectura\) return;/g) || []).length, 4);
+check('ui: 5 acciones bloqueadas en solo lectura', (COMP_SRC.match(/if \(soloLectura\) return;/g) || []).length, 5);
 check('ui: el input de gramos se deshabilita', /value={item\.gramos}[\s\S]{0,120}disabled={soloLectura}/.test(COMP_SRC), true);
 check('ui: arma el resumen del día', /resumenDelDia\(fecha, m, \{/.test(COMP_SRC), true);
 check('ui: guarda el resumen', /saveDailySummary\(r\)/.test(COMP_SRC), true);

@@ -40,12 +40,56 @@ MUTS = [
      'fetch("/data/platos.json", { cache: "no-cache" })',
      'fetch("/data/platos.json")',
      "el recetario se pide sin cache"),
+
+    ("A1 mi version ignora los ajustes", "src/logic/platos.ts",
+     "const ajustes = sel.ajustes ?? {};",
+     "const ajustes: Record<string, number> = {};",
+     "mi version cambia los gramos"),
+
+    ("A2 cada linea se queda sin foodId", "src/logic/platos.ts",
+     "foodId: food.id,",
+     "foodId: undefined,",
+     "cada linea trae su foodId"),
+
+    ("A3 se acepta un ajuste negativo", "src/logic/platos.ts",
+     "!Number.isFinite(g) || g < 0",
+     "!Number.isFinite(g)",
+     "un ajuste negativo se ignora"),
+
+    ("A4 el plato no guarda de donde salio", "src/components/DietModule.tsx",
+     "platoId: plato.id,",
+     "",
+     "DietModule guarda el plato de origen"),
+
+    ("A5 ajustar ya no vuelve la porcion a 1", "src/components/PlatoModal.tsx",
+     "ajustando ? 1 :",
+     "false ? 1 :",
+     "el modal vuelve la porcion a 1 mientras ajustas"),
+
+    ("A6 las filas sueltas pierden su foodId", "src/components/DietModule.tsx",
+     "foodId: l.foodId as number,",
+     "foodId: -1,",
+     "DietModule arma las filas sueltas con su foodId"),
+
+    # El cache local tambien tiene que conservar "mi version": si no, el dia se ve bien
+    # pero al reabrir el plato la receta vuelve a la original (perdida silenciosa).
+    ("D1 el cache pierde mi version", "src/logic/dieta.ts",
+     "...(ajustes ? { ajustes } : {}),",
+     "",
+     "cache: conserva mi version",
+     "scripts/verify-dieta.mjs"),
+
+    ("D2 el cache pierde el plato de origen", "src/logic/dieta.ts",
+     "...(platoId ? { platoId } : {}),",
+     "",
+     "cache: conserva el plato de origen",
+     "scripts/verify-dieta.mjs"),
 ]
 
 
-def correr():
+def correr(script="scripts/verify-platos.mjs"):
     return subprocess.run(
-        ["node", "scripts/verify-platos.mjs"],
+        ["node", script],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
 
@@ -62,7 +106,9 @@ if base.returncode != 0:
 print("Linea base VERDE\n")
 
 rojas = 0
-for nombre, archivo, viejo, nuevo, esperado in MUTS:
+for mut in MUTS:
+    nombre, archivo, viejo, nuevo, esperado = mut[:5]
+    script = mut[5] if len(mut) > 5 else "scripts/verify-platos.mjs"
     shutil.copy2(archivo, archivo + ".bak")
     src = io.open(archivo, encoding="utf-8", newline="").read()
     nl = "\r\n" if "\r\n" in src else "\n"
@@ -74,7 +120,7 @@ for nombre, archivo, viejo, nuevo, esperado in MUTS:
         os.remove(archivo + ".bak")
         continue
     io.open(archivo, "w", encoding="utf-8", newline="").write(src.replace(viejo, nuevo, 1))
-    r = correr()
+    r = correr(script)
     shutil.copy2(archivo + ".bak", archivo)
     os.remove(archivo + ".bak")
     salida = (r.stdout or "") + (r.stderr or "")

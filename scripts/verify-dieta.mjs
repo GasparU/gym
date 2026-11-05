@@ -48,8 +48,33 @@ const cacheOk = {
   cena: [],
 };
 const cacheLeida = leerCacheDe(JSON.stringify(cacheOk));
-check('cache: recupera el dia', cacheLeida ? contarEntradas(cacheLeida) : null, 1);
-check('cache: conserva gramos', cacheLeida?.desayuno[0]?.gramos ?? null, 200);
+    check('cache: recupera el dia', cacheLeida ? contarEntradas(cacheLeida) : null, 1);
+    check('cache: conserva gramos', cacheLeida?.desayuno[0]?.gramos ?? null, 200);
+
+    // "Mi version" del plato: los ajustes tienen que sobrevivir al guardado, si no
+    // el dia se ve bien pero al reabrir el plato vuelve a la receta original.
+    const cachePlato = {
+      desayuno: [],
+      almuerzo: [
+        {
+          id: 'p',
+          foodId: -1,
+          nombre: 'Quinua saltada con pollo y verduras',
+          gramos: 390,
+          kcal: 405.8,
+          proteinas: 34.4,
+          grasa: 16.8,
+          carbohidratos: 42.1,
+          fibra: 3.6,
+          platoId: 'quinua-saltada-con-pollo',
+          ajustes: { 'Quinua cocida': 100 },
+        },
+      ],
+      cena: [],
+    };
+    const platoLeido = leerCacheDe(JSON.stringify(cachePlato));
+    check('cache: conserva el plato de origen', platoLeido?.almuerzo[0]?.platoId ?? null, 'quinua-saltada-con-pollo');
+    check('cache: conserva mi version', platoLeido?.almuerzo[0]?.ajustes?.['Quinua cocida'] ?? null, 100);
 
 check(
   'cache: descarta entradas sin nombre (no queda nada valido)',
@@ -119,8 +144,9 @@ check('cloud: borra antes de insertar (reemplazo)', /\.delete\(\)[\s\S]{0,600}\.
 check('ui: baja el dia al abrir', /loadMealsForDate\(fechaActiva\)/.test(COMP_SRC), true);
 check('ui: escribe la cache local', /localStorage\.setItem\(claveCache\(fecha\)/.test(COMP_SRC), true);
 check('ui: persiste al agregar', /persistir\(siguiente, mealType\);[\s\S]*?persistir\(siguiente, mealType\);/.test(COMP_SRC), true);
-check('ui: persiste al cambiar gramos, al borrar y al agregar un plato', (COMP_SRC.match(/persistir\(siguiente, mealType\);/g) || []).length, 4);
-check('ui: el plato tambien persiste', /addPlatoToMeal[\s\S]{0,900}?persistir\(siguiente, mealType\);/.test(COMP_SRC), true);
+check('ui: persiste al cambiar gramos, al borrar y al agregar (plato o suelto)', (COMP_SRC.match(/persistir\(siguiente, mealType\);/g) || []).length, 5);
+check('ui: el plato tambien persiste', /addPlatoToMeal[\s\S]{0,1400}?persistir\(siguiente, mealType\);/.test(COMP_SRC), true);
+check('ui: el desglose suelto tambien persiste', /addPlatoSuelto[\s\S]{0,1400}?persistir\(siguiente, mealType\);/.test(COMP_SRC), true);
 check('ui: normaliza cuando llega el catalogo', /normalizarEntradas\(prev, foods\)/.test(COMP_SRC), true);
 check('ui: ya NO llama al insert suelto', /syncMealEntry\(/.test(COMP_SRC), false);
 

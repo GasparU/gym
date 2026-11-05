@@ -20,7 +20,14 @@ interface PlatoModalProps {
   /** Comidas donde este rol (sopa / segundo) ya esta ocupado: no se puede repetir. */
   comidasOcupadas?: MealType[];
   onCerrar: () => void;
-  onAgregar: (plato: Plato, calculado: PlatoCalculado, mealType: MealType) => void;
+  onAgregar: (
+plato: Plato,
+calculado: PlatoCalculado,
+mealType: MealType,
+ajustes?: Record<string, number>,
+  ) => void;
+  /** Desglose: el plato entra como N alimentos independientes. */
+  onAgregarSuelto: (calculado: PlatoCalculado, mealType: MealType) => void;
 }
 
 export const PlatoModal: React.FC<PlatoModalProps> = ({
@@ -31,10 +38,14 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
   comidasOcupadas = [],
   onCerrar,
   onAgregar,
+  onAgregarSuelto,
 }) => {
   const [extras, setExtras] = useState<string[]>([]);
   const [factorManual, setFactorManual] = useState<number | null>(null);
   const [comida, setComida] = useState<MealType>(mealTypeInicial);
+  // "Mi version": gramos propios por ingrediente. Vacio = la receta tal cual.
+  const [ajustes, setAjustes] = useState<Record<string, number>>({});
+  const [ajustando, setAjustando] = useState(false);
   const [opciones, setOpciones] = useState<Record<string, string>>(() => {
     const inicial: Record<string, string> = {};
     for (const o of plato.opciones ?? []) inicial[o.id] = o.porDefecto;
@@ -49,13 +60,21 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
     return () => document.removeEventListener('keydown', onKey);
   }, [onCerrar]);
 
-  const seleccion: SeleccionPlato = { extras, opciones };
+      const hayAjustes = Object.keys(ajustes).length > 0;
+      const seleccion: SeleccionPlato = { extras, opciones, ajustes };
 
-  const base = useMemo(() => calcularPlato(plato, seleccion, foods, 1), [plato, extras, opciones, foods]);
-  // NUNCA se infla sola: el ajuste automatico solo puede BAJAR la porcion. Subir es decision del usuario.
-  const sugerido = factorParaPresupuesto(base.totales.kcal, kcalRestantes);
-  const factor = factorManual ?? sugerido;
-  const calc = useMemo(() => calcularPlato(plato, seleccion, foods, factor), [plato, extras, opciones, foods, factor]);
+      const base = useMemo(
+        () => calcularPlato(plato, seleccion, foods, 1),
+        [plato, extras, opciones, ajustes, foods],
+      );
+      // NUNCA se infla sola: el ajuste automatico solo puede BAJAR la porcion. Subir es decision del usuario.
+      const sugerido = factorParaPresupuesto(base.totales.kcal, kcalRestantes);
+      // Mientras ajustas gramos, la porcion queda en 1: lo que editas son los gramos REALES de la receta.
+      const factor = ajustando ? 1 : (factorManual ?? sugerido);
+      const calc = useMemo(
+        () => calcularPlato(plato, seleccion, foods, factor),
+        [plato, extras, opciones, ajustes, foods, factor],
+      );
   const rol: RolPlato = plato.grupo === 'Sopas' ? 'sopa' : 'segundo';
   const bloqueado = comidasOcupadas.includes(comida);
 
@@ -153,27 +172,89 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
             </div>
           ))}
 
-          {/* Ingredientes */}
-          <div className="overflow-hidden rounded-lg border border-slate-700">
-            <table className="w-full text-left text-[11px]">
-              <thead className="bg-slate-800 text-slate-400">
-                <tr>
-                  <th className="px-2 py-1.5">Ingrediente</th>
-                  <th className="px-2 py-1.5 text-right w-16">Gramos</th>
-                  <th className="px-2 py-1.5 text-right w-16">Kcal</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800">
-                {calc.lineas.map((l, i) => (
-                  <tr key={`${l.nombre}-${i}`} className="text-slate-300">
-                    <td className="px-2 py-1.5">{l.nombre}</td>
-                    <td className="px-2 py-1.5 text-right">{numEsMax(l.gramos, 1)}</td>
-                    <td className="px-2 py-1.5 text-right">{numEs(l.kcal)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              {/* Ingredientes (con "mi version": los gramos se pueden editar) */}
+              <div>
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <p className="text-[11px] font-semibold text-slate-300">Ingredientes de la receta</p>
+                  <div className="flex items-center gap-2">
+                    {hayAjustes && !ajustando && (
+                      <button
+                        type="button"
+                        onClick={() => setAjustes({})}
+                        className="text-[10px] text-sky-300 underline"
+                      >
+                        volver a la receta
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAjustando((v) => !v);
+                        setFactorManual(1);
+                      }}
+                      aria-pressed={ajustando}
+                      className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold transition-colors ${
+                        ajustando
+                          ? 'border-emerald-600 bg-emerald-900/40 text-emerald-300'
+                          : 'border-slate-700 text-slate-300 hover:border-slate-500'
+                      }`}
+                    >
+                      {ajustando ? '✓ listo' : '✏️ ajustar gramos'}
+                    </button>
+                  </div>
+                </div>
+                {ajustando && (
+                  <p className="mb-1 text-[10px] leading-snug text-emerald-300/90">
+                    Poné los gramos que comiste de verdad. Mientras ajustás, la porción está en 1.
+                  </p>
+                )}
+                <div className="overflow-hidden rounded-lg border border-slate-700">
+                  <table className="w-full text-left text-[11px]">
+                    <thead className="bg-slate-800 text-slate-400">
+                      <tr>
+                        <th className="px-2 py-1.5">Ingrediente</th>
+                        <th className="px-2 py-1.5 text-right w-16">Gramos</th>
+                        <th className="px-2 py-1.5 text-right w-16">Kcal</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800">
+                      {calc.lineas.map((l, i) => (
+                        <tr key={`${l.nombre}-${i}`} className="text-slate-300">
+                          <td className="px-2 py-1.5">{l.nombre}</td>
+                          <td className="px-2 py-1.5 text-right">
+                            {ajustando ? (
+                              <input
+                                type="number"
+                                inputMode="decimal"
+                                min={0}
+                                max={2000}
+                                step={5}
+                                aria-label={`Gramos de ${l.nombre}`}
+                                value={String(Math.round(l.gramos * 10) / 10)}
+                                onChange={(e) => {
+                                  const crudo = e.target.value;
+                                  const v = Number(crudo);
+                                  setAjustes((prev) => {
+                                    const siguiente = { ...prev };
+                                    // Campo vacio o invalido = se cae el ajuste y vuelve la receta.
+                                    if (crudo.trim() === '' || !Number.isFinite(v) || v < 0) delete siguiente[l.nombre];
+                                    else siguiente[l.nombre] = v;
+                                    return siguiente;
+                                  });
+                                }}
+                                className="w-16 rounded border border-slate-600 bg-slate-800 px-1 py-0.5 text-right text-[11px] text-slate-100"
+                              />
+                            ) : (
+                              numEsMax(l.gramos, 1)
+                            )}
+                          </td>
+                          <td className="px-2 py-1.5 text-right">{numEs(l.kcal)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
           {/* Extras */}
           {(plato.extras ?? []).length > 0 && (
@@ -237,17 +318,21 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
                   {[0.5, 0.75, 1, 1.25, 1.5].map((f) => {
                     const activo = Math.abs(factor - f) < 0.005;
                     return (
-                      <button
-                        key={f}
-                        type="button"
-                        onClick={() => setFactorManual(f)}
-                        aria-pressed={activo}
-                        className={`rounded px-1.5 py-0.5 text-[10px] font-semibold transition-colors ${
-                          activo
-                            ? 'bg-brand-500 text-white'
-                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                        }`}
-                      >
+                          <button
+                            key={f}
+                            type="button"
+                            onClick={() => setFactorManual(f)}
+                            aria-pressed={activo}
+                            disabled={ajustando}
+                            title={ajustando ? 'Terminá de ajustar los gramos para escalar la porción' : undefined}
+                            className={`rounded px-1.5 py-0.5 text-[10px] font-semibold transition-colors ${
+                              ajustando
+                                ? 'cursor-not-allowed bg-slate-800 text-slate-600'
+                                : activo
+                                  ? 'bg-brand-500 text-white'
+                                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                            }`}
+                          >
                         {String(f).replace('.', ',')}
                       </button>
                     );
@@ -275,11 +360,11 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
           </div>
         </div>
 
-        <div className="sticky bottom-0 border-t border-slate-700 bg-slate-900/95 px-4 py-3">
+        <div className="sticky bottom-0 space-y-2 border-t border-slate-700 bg-slate-900/95 px-4 py-3">
           <button
             type="button"
             disabled={bloqueado}
-            onClick={() => onAgregar(plato, calc, comida)}
+            onClick={() => onAgregar(plato, calc, comida, hayAjustes ? ajustes : undefined)}
             className={`w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
               bloqueado
                 ? 'cursor-not-allowed bg-slate-700 text-slate-400'
@@ -290,6 +375,16 @@ export const PlatoModal: React.FC<PlatoModalProps> = ({
               ? `${comida} ya tiene ${rol}`
               : `Agregar a ${comida} · ${textoPorcion(factor)} · ${numEs(calc.totales.kcal)} kcal`}
           </button>
+          <button
+            type="button"
+            onClick={() => onAgregarSuelto(calc, comida)}
+            className="w-full rounded-lg border border-slate-600 px-4 py-2 text-[11px] font-semibold text-slate-300 transition-colors hover:bg-slate-800"
+          >
+            ⤵ Agregar suelto a {comida} · {calc.lineas.length} ingredientes
+          </button>
+          <p className="text-center text-[10px] leading-snug text-slate-500">
+            Suelto = cada ingrediente como fila propia (el plato deja de contar como {rol}).
+          </p>
         </div>
       </div>
     </div>

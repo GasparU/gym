@@ -49,6 +49,20 @@ function esEntradaValida(valor: unknown): valor is MealEntry {
 }
 
 /**
+ * "Mi version" del plato: gramos por ingrediente. Se valida uno por uno.
+ * Un valor roto NO tumba la entrada: se descarta ese ajuste (vuelve la receta).
+ */
+function ajustesValidos(valor: unknown): Record<string, number> | undefined {
+  if (!valor || typeof valor !== 'object') return undefined;
+  const salida: Record<string, number> = {};
+  for (const [nombre, gramos] of Object.entries(valor as Record<string, unknown>)) {
+    const n = Number(gramos);
+    if (nombre.length > 0 && Number.isFinite(n) && n >= 0) salida[nombre] = n;
+  }
+  return Object.keys(salida).length > 0 ? salida : undefined;
+}
+
+/**
  * Lee el texto del localStorage SIN confiar en su forma.
  * Devuelve `null` si no hay nada o si el JSON está roto (se descarta, no se inventa).
  */
@@ -63,17 +77,24 @@ export function leerCacheDe(raw: string | null): Meals | null {
     for (const tipo of MEAL_TYPES) {
       const lista = obj[tipo];
       if (!Array.isArray(lista)) continue;
-      salida[tipo] = lista.filter(esEntradaValida).map((e) => ({
-        id: e.id,
-        foodId: Number.isFinite(Number(e.foodId)) ? Number(e.foodId) : -1,
-        nombre: e.nombre,
-        gramos: numero(e.gramos),
-        kcal: numero(e.kcal),
-        proteinas: numero(e.proteinas),
-        grasa: numero(e.grasa),
-        carbohidratos: numero(e.carbohidratos),
-        fibra: numero(e.fibra),
-      }));
+          salida[tipo] = lista.filter(esEntradaValida).map((e) => {
+            const platoId = typeof e.platoId === 'string' && e.platoId.length > 0 ? e.platoId : undefined;
+            const ajustes = ajustesValidos(e.ajustes);
+            return {
+              id: e.id,
+              foodId: Number.isFinite(Number(e.foodId)) ? Number(e.foodId) : -1,
+              nombre: e.nombre,
+              gramos: numero(e.gramos),
+              kcal: numero(e.kcal),
+              proteinas: numero(e.proteinas),
+              grasa: numero(e.grasa),
+              carbohidratos: numero(e.carbohidratos),
+              fibra: numero(e.fibra),
+              // Sin estas dos, al reabrir el dia el plato volvia a la receta original.
+              ...(platoId ? { platoId } : {}),
+              ...(ajustes ? { ajustes } : {}),
+            };
+          });
       if (salida[tipo].length > 0) algo = true;
     }
     return algo ? salida : null;

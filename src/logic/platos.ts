@@ -52,6 +52,11 @@ export interface PlatoData {
 export interface SeleccionPlato {
   extras?: string[];
   opciones?: Record<string, string>;
+  /**
+   * "Mi version" del plato: gramos propios por NOMBRE de ingrediente (antes del factor).
+   * Sirve para decir "a este plato le puse 5 g de aceite en vez de 10" sin perder la receta.
+   */
+  ajustes?: Record<string, number>;
 }
 
 export interface LineaPlato {
@@ -62,6 +67,8 @@ export interface LineaPlato {
   grasa: number;
   carbohidratos: number;
   fibra: number;
+  /** id del alimento en foods.json: lo usa "agregar suelto" para crear filas reales. */
+  foodId?: number;
 }
 
 export interface TotalesPlato {
@@ -92,7 +99,7 @@ export const GRUPOS_PLATO = [
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 
-/** Ingredientes efectivos = base + opcion elegida (o su defecto) + extras tildados. */
+/** Ingredientes efectivos = base + opcion elegida (o su defecto) + extras tildados, con "mi version". */
 export function ingredientesDe(plato: Plato, sel: SeleccionPlato = {}): IngredientePlato[] {
   const out: IngredientePlato[] = [...plato.ingredientes];
 
@@ -106,7 +113,14 @@ export function ingredientesDe(plato: Plato, sel: SeleccionPlato = {}): Ingredie
     if (sel.extras?.includes(extra.id)) out.push(...extra.ingredientes);
   }
 
-  return out;
+  // Un ajuste se aplica por NOMBRE exacto. Un valor invalido se IGNORA (se queda la receta),
+  // nunca se convierte en 0 ni en NaN: eso borraria comida que la persona si comio.
+  const ajustes = sel.ajustes ?? {};
+  return out.map((ing) => {
+    const g = ajustes[ing.nombre];
+    if (typeof g !== 'number' || !Number.isFinite(g) || g < 0) return ing;
+    return { ...ing, gramos: g };
+  });
 }
 
 /** Calcula lineas y totales. `factor` escala la porcion (1 = receta tal cual). */
@@ -138,6 +152,7 @@ export function calcularPlato(
       grasa: r1(food.grasaTotal * k),
       carbohidratos: r1(food.carbohidratosTotales * k),
       fibra: r1(food.fibra * k),
+      foodId: food.id,
     });
   }
 

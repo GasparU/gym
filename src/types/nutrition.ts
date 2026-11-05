@@ -28,6 +28,10 @@ export interface MealEntry {
   grasa: number;
   carbohidratos: number;
   fibra: number;
+  /** De que plato salio la entrada (foodId = -1). Ausente en un alimento suelto. */
+  platoId?: string;
+  /** "Mi version" del plato: gramos propios por NOMBRE de ingrediente. */
+  ajustes?: Record<string, number>;
 }
 
 export type MealType = 'desayuno' | 'almuerzo' | 'cena';

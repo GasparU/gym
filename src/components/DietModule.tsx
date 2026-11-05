@@ -490,7 +490,12 @@ export const DietModule: React.FC = () => {
       .catch((err) => console.error("Error cargando platos.json:", err));
   }, []);
 
-  const addPlatoToMeal = (mealType: MealType, plato: Plato, calc: PlatoCalculado) => {
+  const addPlatoToMeal = (
+    mealType: MealType,
+    plato: Plato,
+    calc: PlatoCalculado,
+    ajustes?: Record<string, number>,
+  ) => {
     if (soloLectura) return;
     // Doble candado: si esta comida ya tiene uno del mismo rol, no se agrega.
     if (!puedeAgregarPlato(rolDePlato(plato), rolesEnComida(meals[mealType], platos))) return;
@@ -504,11 +509,45 @@ export const DietModule: React.FC = () => {
       grasa: calc.totales.grasa,
       carbohidratos: calc.totales.carbohidratos,
       fibra: calc.totales.fibra,
+      platoId: plato.id,
+      // "Mi version": sin esto, reabrir el dia perderia los gramos que la persona ajusto.
+      ...(ajustes && Object.keys(ajustes).length > 0 ? { ajustes } : {}),
     };
 
     const siguiente: Meals = {
       ...meals,
       [mealType]: [...meals[mealType], nuevaEntrada],
+    };
+    cambiosLocales.current = true;
+    setMeals(siguiente);
+    persistir(siguiente, mealType);
+  };
+
+  /**
+   * Desglose: el plato entra como N alimentos independientes (uno por ingrediente).
+   * Se usa la linea ya calculada (con factor y "mi version"), asi los totales coinciden
+   * exactamente con lo que muestra el modal: no se recalcula nada por otro camino.
+   */
+  const addPlatoSuelto = (mealType: MealType, calc: PlatoCalculado) => {
+    if (soloLectura) return;
+    const nuevas: MealEntry[] = calc.lineas
+      .filter((l) => typeof l.foodId === "number" && l.foodId > 0 && l.gramos > 0)
+      .map((l) => ({
+        id: crypto.randomUUID(),
+        foodId: l.foodId as number,
+        nombre: l.nombre,
+        gramos: l.gramos,
+        kcal: l.kcal,
+        proteinas: l.proteinas,
+        grasa: l.grasa,
+        carbohidratos: l.carbohidratos,
+        fibra: l.fibra,
+      }));
+    if (nuevas.length === 0) return;
+
+    const siguiente: Meals = {
+      ...meals,
+      [mealType]: [...meals[mealType], ...nuevas],
     };
     cambiosLocales.current = true;
     setMeals(siguiente);
@@ -1117,15 +1156,25 @@ export const DietModule: React.FC = () => {
 
                               {item.nombre}
 
-                                {(() => {
-                                  const pl = platos.find((x) => x.nombre === item.nombre);
-                                  if (!pl) return null;
-                                  return (
-                                    <span className="ml-1 rounded bg-brand-500/20 px-1 py-0.5 text-[9px] font-bold text-brand-300">
-                                      {pl.grupo === "Sopas" ? "SOPA" : "2º"}
-                                    </span>
-                                  );
-                                })()}
+                                  {(() => {
+                                    const pl = platos.find((x) => x.nombre === item.nombre);
+                                    if (!pl) return null;
+                                    return (
+                                      <>
+                                        <span className="ml-1 rounded bg-brand-500/20 px-1 py-0.5 text-[9px] font-bold text-brand-300">
+                                          {pl.grupo === "Sopas" ? "SOPA" : "2º"}
+                                        </span>
+                                        {item.ajustes && Object.keys(item.ajustes).length > 0 && (
+                                          <span
+                                            title="Le cambiaste los gramos a la receta"
+                                            className="rounded bg-emerald-500/20 px-1 py-0.5 text-[9px] font-bold text-emerald-300"
+                                          >
+                                            MI VERSIÓN
+                                          </span>
+                                        )}
+                                      </>
+                                    );
+                                  })()}
 
                               {(() => {
 
@@ -1191,8 +1240,12 @@ export const DietModule: React.FC = () => {
           mealTypeInicial={platoAbierto.mealType}
           comidasOcupadas={comidasOcupadasPara(rolDePlato(platoAbierto.plato))}
           onCerrar={() => setPlatoAbierto(null)}
-          onAgregar={(plato, calc, mealType) => {
-            addPlatoToMeal(mealType, plato, calc);
+          onAgregar={(plato, calc, mealType, ajustes) => {
+            addPlatoToMeal(mealType, plato, calc, ajustes);
+            setPlatoAbierto(null);
+          }}
+          onAgregarSuelto={(calc, mealType) => {
+            addPlatoSuelto(mealType, calc);
             setPlatoAbierto(null);
           }}
         />

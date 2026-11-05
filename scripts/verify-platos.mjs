@@ -168,6 +168,37 @@ for (const p of platos) {
       ['quinua-saltada-con-pollo'],
     );
 
+    // ---- "Mi version": ajustar los gramos de UN ingrediente (05/11/2026) ----
+    // El plato sigue siendo UNA fila: lo que cambia son los gramos que comiste de verdad.
+    const conAjuste = calcularPlato(quinua, { ajustes: { 'Quinua cocida': 100 } }, foods, 1);
+    check(
+      'mi version cambia los gramos',
+      conAjuste.lineas.find((l) => l.nombre === 'Quinua cocida')?.gramos,
+      100,
+    );
+    checkCerca('mi version baja el total', conAjuste.totales.kcal, 405.8);
+    checkCerca('la receta original NO se toca', calcularPlato(quinua, {}, foods, 1).totales.kcal, 494.8);
+    checkCerca(
+      'un ajuste negativo se ignora (no borra comida)',
+      calcularPlato(quinua, { ajustes: { 'Quinua cocida': -5 } }, foods, 1).totales.kcal,
+      494.8,
+    );
+    checkCerca(
+      'un ajuste de otro plato se ignora',
+      calcularPlato(quinua, { ajustes: { 'No existe': 50 } }, foods, 1).totales.kcal,
+      494.8,
+    );
+    check(
+      'cada linea trae su foodId (para el desglose)',
+      calcularPlato(quinua, {}, foods, 1).lineas.every((l) => typeof l.foodId === 'number' && l.foodId > 0),
+      true,
+    );
+    check(
+      'el desglose suma lo mismo que el plato',
+      Math.round(conAjuste.lineas.reduce((s, l) => s + l.kcal, 0) * 10) / 10,
+      conAjuste.totales.kcal,
+    );
+
     // ---- Buscador: NUNCA puede cortar la lista (pedido del dueno, 05/11/2026) ----
     // "pongo quinua y solo sale sopa de quinua": el buscador ya no limita resultados, pero
     // se congela aca para que nadie meta un `.slice(0, N)` sin darse cuenta.
@@ -179,6 +210,19 @@ for (const p of platos) {
     check('el buscador busca por NOMBRE sin acentos', /normalize\('NFD'\)/.test(buscador), true);
     check('el buscador avisa cuando hay que deslizar', /desliz/i.test(buscador), true);
     check('el recetario se pide sin cache', /cache:\s*['"]no-cache['"]/.test(diet), true);
+
+    // ---- Cableado de "las dos cosas": ajustar gramos + agregar suelto ----
+    const modal = fs.readFileSync('src/components/PlatoModal.tsx', 'utf8');
+    check('el modal deja ajustar gramos', /ajustar gramos/.test(modal), true);
+    check('el modal ofrece el desglose suelto', /onAgregarSuelto/.test(modal), true);
+    check('el modal vuelve la porcion a 1 mientras ajustas', /ajustando \? 1 :/.test(modal), true);
+    check('el modal puede volver a la receta', /volver a la receta/.test(modal), true);
+    check('DietModule guarda el plato de origen', /platoId: plato\.id/.test(diet), true);
+    check(
+      'DietModule arma las filas sueltas con su foodId',
+      /foodId: l\.foodId as number/.test(diet),
+      true,
+    );
 
     // ---- Variantes cambian el total ----
 const seco = platos.find((p) => p.id === 'seco-de-pollo');
